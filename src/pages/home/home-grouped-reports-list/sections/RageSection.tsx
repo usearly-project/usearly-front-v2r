@@ -17,7 +17,12 @@ interface RageSectionProps {
   >;
   searchTerm: string;
   setSearchTerm: (value: string) => void;
-  reportData: { data?: any; loading: boolean };
+  reportData: {
+    data: any[];
+    loading: boolean;
+    hasMore: boolean;
+    loadMore: () => void;
+  };
   loaderRef: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -42,7 +47,7 @@ const RageSection: React.FC<RageSectionProps> = ({
   loaderRef,
 }) => {
   // 🕓 Chargement
-  if (reportData.loading) {
+  /*   if (reportData.loading) {
     return (
       <SqueletonAnime
         loaderRef={loaderRef}
@@ -51,10 +56,10 @@ const RageSection: React.FC<RageSectionProps> = ({
         error={null}
       />
     );
-  }
+  } */
 
   // ⚠️ Aucun signalement rageux
-  if (!reportData.data || Object.keys(reportData.data).length === 0) {
+  if (!reportData.data || reportData.data.length === 0) {
     return (
       <div style={{ padding: "20px", textAlign: "center", color: "#888" }}>
         Aucun signalement rageux trouvé.
@@ -102,12 +107,25 @@ const RageSection: React.FC<RageSectionProps> = ({
       )}
 
       <RageReportsList
+        data={reportData.data}
+        loading={reportData.loading}
+        hasMore={reportData.hasMore}
+        loadMore={reportData.loadMore}
+        loaderRef={loaderRef}
         expandedItems={expandedItems}
         handleToggle={(key: string) =>
           setExpandedItems((prev) => ({ ...prev, [key]: !prev[key] }))
         }
         searchTerm={searchTerm}
         onClearSearchTerm={() => setSearchTerm("")}
+      />
+
+      {/* 👇 LE LOADER DOIT ETRE ICI */}
+      <SqueletonAnime
+        loaderRef={loaderRef}
+        loading={reportData.loading}
+        hasMore={reportData.hasMore}
+        error={null}
       />
     </>
   );

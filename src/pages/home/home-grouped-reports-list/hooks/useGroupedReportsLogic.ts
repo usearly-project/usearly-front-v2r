@@ -86,7 +86,7 @@ export function useGroupedReportsLogic(
   // HOOKS BRUTS
   // ===============================
   const confirmedData = useConfirmedFlatData();
-  const rageData = usePaginatedGroupedReportsByRage(filter === "rage", 10);
+  const rageData = usePaginatedGroupedReportsByRage(filter === "rage", 5);
   const hotData = usePaginatedGroupedReportsByHot(filter === "hot", 10);
   const popularEngagementData = usePaginatedGroupedReportsByPopularEngagement(
     filter === "popular",
@@ -175,13 +175,33 @@ export function useGroupedReportsLogic(
     if (onSectionChange) onSectionChange(derivedSection);
   }, [derivedSection, onSectionChange]);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (initializing) {
       setFilter("chrono");
       setInitializing(false);
     }
-  }, [initializing]);
+  }, [initializing]); */
+  useEffect(() => {
+    if (!initializing) return;
 
+    const checkDefaultFilter = async () => {
+      if (!initializing) return;
+
+      try {
+        const res = await apiService.get("/public/rage-reports", {
+          params: { page: 1, limit: 1 },
+        });
+
+        setFilter(res?.data?.data?.length ? "rage" : "chrono");
+      } catch {
+        setFilter("chrono");
+      } finally {
+        setInitializing(false);
+      }
+    };
+
+    checkDefaultFilter();
+  }, [initializing]);
   // ===============================
   // FETCH PAR MARQUE
   // ===============================

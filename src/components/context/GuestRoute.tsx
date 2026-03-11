@@ -17,7 +17,7 @@ const GuestRoute: React.FC<GuestRouteProps> = ({ children }) => {
   // 🔐 Rediriger les utilisateurs connectés
   if (isAuthenticated && userProfile) {
     const redirectPath =
-      userProfile.type === "brand" ? "/dashboard-brand" : "/profile";
+      userProfile.type === "brand" ? "/dashboard-brand" : "/feedback";
     return <Navigate to={redirectPath} replace />;
   }
 

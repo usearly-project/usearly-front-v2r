@@ -106,7 +106,6 @@ const HomeGroupedReportsList: React.FC<Props> = ({
       })),
     [brands],
   );
-  console.log("✅ availableBrands envoyés à BrandSelect:", availableBrands);
 
   const handleSearchTermChange = useCallback(
     (value: string) => {
@@ -227,7 +226,35 @@ const HomeGroupedReportsList: React.FC<Props> = ({
   }, [filteredReports]);
 
   const isFeedLoading = Boolean(reportData?.loading || loadingFiltered);
+  useEffect(() => {
+    const el = loaderRef.current;
+    if (!el) return;
 
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+
+        if (entry.isIntersecting) {
+          console.log("👀 loader visible");
+
+          if (
+            reportData &&
+            "loadMore" in reportData &&
+            typeof reportData.loadMore === "function"
+          ) {
+            reportData.loadMore();
+          }
+        }
+      },
+      {
+        rootMargin: "200px",
+      },
+    );
+
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, [reportData]);
   // === Initial loading ===
   if (initializing) {
     return (
@@ -309,7 +336,14 @@ const HomeGroupedReportsList: React.FC<Props> = ({
           setExpandedItems={setExpandedItems}
           searchTerm={searchTermValue}
           setSearchTerm={handleSearchTermChange}
-          reportData={reportData}
+          reportData={
+            reportData as {
+              data: any[];
+              loading: boolean;
+              hasMore: boolean;
+              loadMore: () => void;
+            }
+          }
           loaderRef={loaderRef}
         />
       ) : filter === "popular" ? (

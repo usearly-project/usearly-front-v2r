@@ -45,12 +45,12 @@ export const getEnflammesCoupsDeCoeur = async (
 /**
  * 🔥 Récupérer les coups de cœur publics (liste simple)
  */
-export const getPublicCoupsDeCoeur = async (page = 1, limit = 10) => {
+/* export const getPublicCoupsDeCoeur = async (page = 1, limit = 10) => {
   const { data } = await apiService.get(`/public/user/coupsdecoeurs`, {
     params: { page, limit },
   });
   return data;
-};
+}; */
 
 export const getCoupsDeCoeurByBrand = async (
   brand: string,

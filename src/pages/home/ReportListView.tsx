@@ -1,5 +1,3 @@
-import "./ReportListView.scss";
-
 import ChronologicalReportList from "@src/components/report-grouped/ChronologicalReportList";
 import ChronoReportCard from "@src/components/report-grouped/report-by-date/ChronoReportCard";
 import HomeBrandBlock from "@src/components/home-grouped-reports-list/HomeBrandBlock";
@@ -10,28 +8,36 @@ import type {
   PublicGroupedReport,
 } from "@src/types/Reports";
 import FlatSubcategoryBlock from "./confirm-reportlist/FlatSubcategoryBlock";
-/* import { getBrandLogo } from "@src/utils/brandLogos"; */
 import SqueletonAnime from "@src/components/loader/SqueletonAnime";
 import "./countBarBrand.scss";
 import {
   matchesExplodedReportSearch,
   normalizeSearchText,
 } from "@src/utils/reportSearch";
+import "./ReportListView.scss";
 
 interface Props {
   filter: string;
   viewMode: "flat" | "chrono" | "confirmed";
+
   flatData: Array<ExplodedGroupedReport | PublicGroupedReport>;
   chronoData: Record<string, any[]>;
   popularData: Record<string, PopularGroupedReport[]>;
   popularEngagementData: Record<string, PopularGroupedReport[]>;
   rageData: Record<string, PopularGroupedReport[]>;
+
   expandedItems: Record<string, boolean>;
   handleToggle: (key: string) => void;
+
   loadingChrono: boolean;
   loadingPopular: boolean;
   loadingPopularEngagement: boolean;
   loadingRage: boolean;
+
+  hasMoreRage?: boolean;
+  loadMoreRage?: () => void;
+  loaderRef?: React.RefObject<HTMLDivElement | null>;
+
   searchTerm?: string;
   onClearSearchTerm?: () => void;
 }
@@ -58,15 +64,6 @@ const ReportListView: React.FC<Props> = ({
   const isChronoFilter = filter === "chrono";
 
   if (isPopularFilter) {
-    /* const { groupedByDay, isLoading } =
-      filter === "popular"
-        ? {
-            groupedByDay: popularEngagementData,
-            isLoading: loadingPopularEngagement,
-          }
-        : filter === "rage"
-          ? { groupedByDay: rageData, isLoading: loadingRage }
-          : { groupedByDay: popularData, isLoading: loadingPopular }; */
     const { groupedByDay, isLoading } =
       filter === "hot"
         ? { groupedByDay: popularData, isLoading: loadingPopular }

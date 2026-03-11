@@ -163,7 +163,78 @@ apiService.interceptors.request.use(
 );
 
 // 🟣 Intercepteur de réponse → gère les 401 (token expiré)
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+const subscribeTokenRefresh = (cb: (token: string) => void) => {
+  refreshSubscribers.push(cb);
+};
+
+const onRefreshed = (token: string) => {
+  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers = [];
+};
+
 apiService.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    const isAuthRoute =
+      originalRequest?.url?.includes("/user/login") ||
+      originalRequest?.url?.includes("/user/refresh-token");
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthRoute
+    ) {
+      originalRequest._retry = true;
+
+      if (!isRefreshing) {
+        isRefreshing = true;
+
+        try {
+          const newAccessToken = await refreshToken();
+
+          if (!newAccessToken) {
+            throw new Error("Refresh token failed");
+          }
+
+          storeTokenInCurrentStorage(newAccessToken);
+
+          apiService.defaults.headers.common["Authorization"] =
+            `Bearer ${newAccessToken}`;
+
+          onRefreshed(newAccessToken);
+
+          isRefreshing = false;
+
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+
+          return apiService(originalRequest);
+        } catch (err) {
+          isRefreshing = false;
+          console.error("❌ refresh token échoué :", err);
+
+          window.location.href = "/";
+
+          return Promise.reject(err);
+        }
+      }
+
+      return new Promise((resolve) => {
+        subscribeTokenRefresh((token: string) => {
+          originalRequest.headers["Authorization"] = `Bearer ${token}`;
+          resolve(apiService(originalRequest));
+        });
+      });
+    }
+
+    return Promise.reject(error);
+  },
+);
+/* apiService.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
@@ -201,7 +272,7 @@ apiService.interceptors.response.use(
 
     return Promise.reject(error);
   },
-);
+); */
 
 export const confirmEmailRequest = async (
   data: { token: string } | { otp: string; email: string },

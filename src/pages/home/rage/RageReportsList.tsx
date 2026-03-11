@@ -1,22 +1,33 @@
 import React from "react";
-import { usePaginatedGroupedReportsByRage } from "@src/hooks/usePaginatedGroupedReportsByRage";
-import type { ExplodedGroupedReport } from "@src/types/Reports";
+import type {
+  ConfirmedSubcategoryReport,
+  ExplodedGroupedReport,
+} from "@src/types/Reports";
 import ReportListView from "../ReportListView";
 import { useBrandResponsesMap } from "@src/hooks/useBrandResponsesMap";
 import { normalizeBrandResponse } from "@src/utils/brandResponse";
 
 const RageReportsList = ({
+  data,
+  loading,
+  hasMore,
+  loadMore,
+  loaderRef,
   expandedItems,
   handleToggle,
   searchTerm,
   onClearSearchTerm,
 }: {
+  data: ConfirmedSubcategoryReport[];
+  loading: boolean;
+  hasMore: boolean;
+  loadMore: () => void;
+  loaderRef: React.RefObject<HTMLDivElement | null>;
   expandedItems: Record<string, boolean>;
   handleToggle: (key: string) => void;
   searchTerm?: string;
   onClearSearchTerm?: () => void;
 }) => {
-  const { data, loading } = usePaginatedGroupedReportsByRage(true);
   const reportIds = React.useMemo(
     () => data.map((r) => String(r.reportingId)),
     [data],
@@ -69,18 +80,21 @@ const RageReportsList = ({
   return (
     <ReportListView
       filter="rage"
-      viewMode="confirmed" // 👈 flat comme confirmed
+      viewMode="confirmed"
       flatData={explodedData}
       chronoData={{}}
       popularData={{}}
       popularEngagementData={{}}
-      rageData={{}} // pas utilisé ici
+      rageData={{}}
       expandedItems={expandedItems}
       handleToggle={handleToggle}
       loadingChrono={false}
       loadingPopular={false}
       loadingPopularEngagement={false}
       loadingRage={loading}
+      hasMoreRage={hasMore}
+      loadMoreRage={loadMore}
+      loaderRef={loaderRef}
       searchTerm={searchTerm}
       onClearSearchTerm={onClearSearchTerm}
     />

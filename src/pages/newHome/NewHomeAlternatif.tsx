@@ -1,6 +1,5 @@
 import React, { useCallback, useRef } from "react";
 import "./NewHomeAlternatif.scss";
-import BrandCard from "./card/BrandCard";
 import Footer from "@src/components/layout/Footer";
 import TitleSection from "@src/pages/aboutClassic/components/TitleSection";
 import ExtensionExample from "./components/extensionExample/ExtensionExample";
@@ -65,7 +64,7 @@ const NewHome: React.FC = () => {
       {/* --- SUITE DU CONTENU (NON AFFECTÉ) --- */}
       <div className="new-home-main">
         <FavoriteCarouselSection />
-        <BrandCard />
+        {/* <BrandCard /> */}
         <div className="usearly-drawing-container">
           <UsearlyDrawing animationDuration="25" />
           <Footer />
