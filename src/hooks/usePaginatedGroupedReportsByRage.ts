@@ -21,7 +21,6 @@ export const usePaginatedGroupedReportsByRage = (
     try {
       const res = await getRageReports(page, pageSize);
       const newData: ConfirmedSubcategoryReport[] = res.data || [];
-
       const reportIds = Array.from(new Set(newData.map((d) => d.reportingId)));
 
       const { data: map } = await apiService.post(
@@ -31,6 +30,7 @@ export const usePaginatedGroupedReportsByRage = (
 
       const enriched = newData.map((item) => ({
         ...item,
+        solutionsCount: item.solutionsCount ?? 0,
         hasBrandResponse: normalizeBrandResponse(map[item.reportingId], {
           brand: item.marque,
           siteUrl: item.siteUrl ?? null,

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
 import { getCategoryIconPathFromSubcategory } from "@src/utils/IconsUtils";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -20,6 +19,8 @@ import type { TicketStatusKey } from "@src/types/ticketStatus";
 import type { HasBrandResponse } from "@src/types/brandResponse";
 import { useIsMobile } from "@src/hooks/use-mobile";
 import FlatSubcategoryBlockMobile from "./FlatSubcategoryBlockMobile";
+import SolutionModal from "@src/components/ui/SolutionModal";
+import SolutionsModal from "@src/components/ui/SolutionsModal";
 
 interface Props {
   brand: string;
@@ -33,6 +34,7 @@ interface Props {
   hasBrandResponse?: HasBrandResponse;
   hideFooter?: boolean;
   forceOpenComments?: boolean;
+  solutionsCount?: number;
 }
 
 const FlatSubcategoryBlock: React.FC<Props> = ({
@@ -46,6 +48,7 @@ const FlatSubcategoryBlock: React.FC<Props> = ({
   status,
   capture,
   forceOpenComments = false,
+  solutionsCount: solutionsCountProp,
 }) => {
   const [expanded, setExpanded] = useState(true);
   const [showComments, setShowComments] = useState(false);
@@ -56,6 +59,15 @@ const FlatSubcategoryBlock: React.FC<Props> = ({
   const initialDescription = descriptions?.[0];
   const [showCapturePreview, setShowCapturePreview] = useState(false);
   const isMobile = useIsMobile();
+  const [showSolutionModal, setShowSolutionModal] = useState(false);
+  const [showSolutionsList, setShowSolutionsList] = useState(false);
+  const [solutionsCount, setSolutionsCount] = useState<number>(
+    solutionsCountProp ?? 0,
+  );
+
+  useEffect(() => {
+    setSolutionsCount(solutionsCountProp ?? 0);
+  }, [solutionsCountProp]);
 
   // ✅ Appelé avant tout return
   const brandLogos = useBrandLogos([{ brand, siteUrl }]);
@@ -66,13 +78,6 @@ const FlatSubcategoryBlock: React.FC<Props> = ({
     refreshKey,
   );
   const effectiveReportIds = reportIds ?? (reportId ? [reportId] : []);
-
-  /* const hasBrandResponse =
-  effectiveReportIds.some((id) =>
-    descriptions.some(
-      (d) => d.reportingId === id && d.author?.type === "brand"
-    )
-  ); */
 
   // ✅ AUTHOR SAFE (aligné API)
   const safeAuthor = {
@@ -196,9 +201,14 @@ const FlatSubcategoryBlock: React.FC<Props> = ({
                   ? subcategory
                   : initialDescription?.title || "Autre problème"}
               </h4>
-              {descriptions.length > 1 && (
-                <span className="count-badge">{descriptions.length}</span>
-              )}
+              <span className="date-badge">
+                {formatDistanceToNow(new Date(initialDescription.createdAt), {
+                  locale: fr,
+                  addSuffix: true,
+                })
+                  .replace("environ ", "")
+                  .replace("il y a ", "")}
+              </span>
             </div>
           </div>
         </div>
@@ -233,7 +243,6 @@ const FlatSubcategoryBlock: React.FC<Props> = ({
                   type="report"
                 />
               </div>
-              <ChevronUp size={16} />
             </div>
           ) : (
             <div className="collapsed-header">
@@ -252,7 +261,6 @@ const FlatSubcategoryBlock: React.FC<Props> = ({
                 preferBrandLogo={true}
                 siteUrl={siteUrl}
               />
-              <ChevronDown size={16} />
             </div>
           )}
         </div>
@@ -327,11 +335,21 @@ const FlatSubcategoryBlock: React.FC<Props> = ({
             descriptionId={initialDescription.id}
             reportsCount={descriptions.length}
             commentsCount={comments.length}
+            descriptions={descriptions}
             hasBrandResponse={hasBrandResponse}
             status={status}
+            type="report"
+            solutionsCount={solutionsCount}
             onReactClick={() => {}}
             onCommentClick={handleToggleComments}
             onToggleSimilarReports={handleToggleSimilarReports}
+            onOpenSolutionModal={() => {
+              if (solutionsCount > 0) {
+                setShowSolutionsList(true);
+              } else {
+                setShowSolutionModal(true);
+              }
+            }}
           />
 
           {showComments && (
@@ -430,6 +448,25 @@ const FlatSubcategoryBlock: React.FC<Props> = ({
             </div>
           )}
         </div>
+      )}
+      {showSolutionModal && (
+        <SolutionModal
+          reportId={reportId || effectiveReportIds[0]}
+          onClose={() => setShowSolutionModal(false)}
+          onSuccess={() => {
+            setSolutionsCount((prev) => prev + 1);
+          }}
+        />
+      )}
+      {showSolutionsList && (
+        <SolutionsModal
+          reportId={reportId || effectiveReportIds[0]}
+          onClose={() => setShowSolutionsList(false)}
+          onAddSolution={() => {
+            setShowSolutionsList(false);
+            setShowSolutionModal(true);
+          }}
+        />
       )}
     </div>
   );

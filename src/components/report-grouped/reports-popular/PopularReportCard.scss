@@ -1,6 +1,3 @@
-@use "../../../styles/base/_variables.scss" as *;
-@use "../../../styles/components/_capturePreview.scss" as *;
-
 .badge-count {
   background-color: #8b5cf6;
   color: white;
@@ -15,4 +12,46 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0; // pour que le badge ne rétrécisse jamais
+}
+.date-badge {
+  font-size: 12px;
+  color: #9b9b9b;
+  font-weight: 500;
+}
+
+.auth-tooltip {
+  position: absolute;
+  bottom: 70px; // ajuste selon ton UI
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+
+  opacity: 0;
+  animation: fadeInOut 2s ease forwards;
+
+  pointer-events: none;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -5px);
+  }
 }

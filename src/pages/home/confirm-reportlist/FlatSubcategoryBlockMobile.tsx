@@ -205,6 +205,7 @@ const FlatSubcategoryBlockMobile: React.FC<Props> = ({
 
           <ReportActionsBarWithReactions
             userId={initialDescription.user?.id}
+            type="report"
             descriptionId={initialDescription.id}
             reportsCount={descriptions.length}
             commentsCount={commentsCount}

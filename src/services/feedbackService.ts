@@ -230,3 +230,54 @@ export const getCommentLikesCount = async (commentId: string) => {
 export const fetchComments = async (type: string, parentId: string) => {
   return apiService.get(`/comments/${type}/${parentId}`);
 };
+
+export const getPublicFeed = async (limit = 30, cursor?: string) => {
+  const params: any = { limit };
+
+  if (cursor) {
+    params.cursor = cursor;
+  }
+
+  const response = await apiService.get("/public/reports", { params });
+
+  return response.data;
+};
+
+export const getWeeklyImpact = async () => {
+  const response = await apiService.get("/user/stats/weekly-impact");
+  return response.data;
+};
+
+export const getTrendingBrands = async () => {
+  const res = await apiService.get("/brands/trending");
+  return res.data;
+};
+
+export const getRightSidebarStats = async () => {
+  const res = await apiService.get("/reports/stats/right-sidebar");
+  return res.data;
+};
+
+export const voteSolution = async (solutionId: string, value: number) => {
+  const res = await apiService.post("/user/reporting-solutions/vote", {
+    solutionId,
+    value,
+  });
+  return res.data;
+};
+
+export const createSolution = async (data: {
+  reportId: string;
+  message: string;
+}) => {
+  const res = await apiService.post("/user/reporting-solutions", data);
+  return res.data;
+};
+
+export const getSolutionsByReport = async (reportId: string) => {
+  const response = await apiService.get(
+    `/reporting-solutions/report/${reportId}`,
+  );
+
+  return response.data;
+};

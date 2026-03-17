@@ -39,7 +39,6 @@ function groupReportsAsTickets(reports: any[]) {
         siteUrl: r.siteUrl,
         capture: r.capture ?? null,
 
-        // 🔑 pivot = MIN(reportingId) (aligné front marque)
         pivotReportId: r.reportingId,
         reportIds: [r.reportingId],
 
@@ -51,9 +50,11 @@ function groupReportsAsTickets(reports: any[]) {
 
         status: r.status as TicketStatusKey,
         count: 1,
+
+        // 🔥 ICI
+        solutionsCount: r.solutionsCount ?? 0,
       };
     } else {
-      // 🔑 pivot stable
       if (r.reportingId < map[sub].pivotReportId) {
         map[sub].pivotReportId = r.reportingId;
       }
@@ -67,11 +68,14 @@ function groupReportsAsTickets(reports: any[]) {
         map[sub].descriptions.push(r.description);
       }
 
-      // 🔥 statut global
       map[sub].status = getMostAdvancedStatus(
         map[sub].status,
         r.status as TicketStatusKey,
       );
+
+      // 🔥 ICI
+      map[sub].solutionsCount =
+        (map[sub].solutionsCount ?? 0) + (r.solutionsCount ?? 0);
     }
   }
 
@@ -180,7 +184,8 @@ const BrandFilteredSection: React.FC<BrandFilteredSectionProps> = ({
             capture={ticket.capture}
             status={ticket.status}
             hideFooter={true}
-            hasBrandResponse={hasBrandResponse} // ✅ ICI
+            hasBrandResponse={hasBrandResponse}
+            solutionsCount={ticket.solutionsCount}
           />
         );
       })}

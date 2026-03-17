@@ -41,7 +41,7 @@ const SuggestionDetail = () => {
           key={suggestion.id}
           item={{ ...suggestion, type: "suggestion" }}
           isOpen={true}
-          onToggle={() => {}}
+          //onToggle={() => {}}
         />
       </div>
       <UsearlyDraw />

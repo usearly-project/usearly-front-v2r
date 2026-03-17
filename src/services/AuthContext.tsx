@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
 
       if (fullProfile.type === "user") {
-        navigate("/feedback");
+        navigate("/");
       } else {
         navigate("/dashboard-brand");
       }
@@ -91,14 +91,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUserProfile(null);
 
     delete apiService.defaults.headers.common["Authorization"];
-
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userType");
     sessionStorage.removeItem("accessToken");
     sessionStorage.removeItem("userType");
-
     setIsLoading(false);
-
     navigate("/");
   };
 
@@ -162,7 +159,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsAuthenticated(true);
       } catch (err) {
         console.error("❌ restauration session échouée :", err);
-        logout();
+
+        const hadToken = !!getAccessToken();
+
+        if (hadToken) {
+          logout(); // ✅ vrai cas invalide
+        } else {
+          // ✅ utilisateur public → pas de redirect
+          setIsAuthenticated(false);
+          setUserProfile(null);
+        }
       } finally {
         // 🔥 toujours arrêter le loading
         setIsLoading(false);

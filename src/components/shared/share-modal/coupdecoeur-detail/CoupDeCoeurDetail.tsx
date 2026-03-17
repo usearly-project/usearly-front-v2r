@@ -44,7 +44,7 @@ const CoupDeCoeurDetail = () => {
             key={coupDeCoeur.id}
             item={{ ...coupDeCoeur, type: "coupdecoeur" }}
             isOpen={true}
-            onToggle={() => {}}
+            //onToggle={() => {}}
           />
         </div>
         <UsearlyDraw />

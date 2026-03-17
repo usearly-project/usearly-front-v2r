@@ -37,7 +37,23 @@ export const usePaginatedGroupedReportsByHot = (
 
           [...prev, ...flat].forEach((item) => {
             const key = `${item.reportingId}-${item.subCategory}`;
-            map.set(key, item);
+            //map.set(key, item);
+            const existing = map.get(key);
+
+            if (!existing) {
+              map.set(key, item);
+            } else {
+              map.set(key, {
+                ...existing,
+                ...item,
+
+                // 🔥 IMPORTANT : garder la valeur la plus fiable
+                solutionsCount: Math.max(
+                  existing.solutionsCount ?? 0,
+                  item.solutionsCount ?? 0,
+                ),
+              });
+            }
           });
 
           return Array.from(map.values());

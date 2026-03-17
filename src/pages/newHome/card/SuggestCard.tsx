@@ -18,7 +18,7 @@ const SuggestCard: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const suggestions = fakeSuggestions;
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [openCardId, setOpenCardId] = useState<string | null>(null);
+  const [openCardId, ,] = useState<string | null>(null);
 
   const slideCount = suggestions.length;
   const slideWidth = slideCount > 0 ? 100 / slideCount : 100;
@@ -35,12 +35,12 @@ const SuggestCard: React.FC = () => {
       navigate("/login");
       return;
     }
-    navigate("/feedback");
+    navigate("/");
   };
 
-  const handleToggleCard = (id: string) => {
+  /*  const handleToggleCard = (id: string) => {
     setOpenCardId((prev) => (prev === id ? null : id));
-  };
+  }; */
   return (
     <div className="suggest-card">
       <div className="suggest-title">
@@ -65,13 +65,13 @@ const SuggestCard: React.FC = () => {
               <InteractiveFeedbackCard
                 item={suggestion}
                 isOpen={openCardId === suggestion.id}
-                onToggle={handleToggleCard}
+                //onToggle={handleToggleCard}
                 addClassName="guest-mode"
               />
               <InteractiveFeedbackCard
                 item={suggestion}
                 isOpen={openCardId === suggestion.id}
-                onToggle={handleToggleCard}
+                //onToggle={handleToggleCard}
                 addClassName="guest-mode"
               />
             </div>

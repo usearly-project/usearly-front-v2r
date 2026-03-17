@@ -107,9 +107,9 @@ const UserFeedbackView: React.FC<Props> = ({ activeTab }) => {
               key={item.id || `feedback-${index}`}
               item={{ ...item, type: "coupdecoeur" }}
               isOpen={openId === item.id}
-              onToggle={(id) =>
+              /* onToggle={(id) =>
                 setOpenId((prev: string | null) => (prev === id ? null : id))
-              }
+              } */
             />
           ))}
         </>
@@ -124,9 +124,9 @@ const UserFeedbackView: React.FC<Props> = ({ activeTab }) => {
               key={item.id || `feedback-${index}`}
               item={{ ...item, type: "suggestion" }}
               isOpen={openId === item.id}
-              onToggle={(id) =>
+              /* onToggle={(id) =>
                 setOpenId((prev: string | null) => (prev === id ? null : id))
-              }
+              } */
             />
           ))}
         </>

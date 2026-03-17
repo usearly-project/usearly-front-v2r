@@ -99,7 +99,7 @@ const ChronoSection: React.FC<ChronoSectionProps> = ({
       </div>
     );
   }
-
+  console.log("CHRONO DATA 👉", chronoData.data);
   // ✅ Contenu principal
   return (
     <div className="recent-reports-list">
@@ -137,6 +137,7 @@ const ChronoSection: React.FC<ChronoSectionProps> = ({
                   status={report.status}
                   descriptions={report.subCategory.descriptions || []}
                   capture={report.capture || null}
+                  solutionsCount={report.solutionsCount ?? 0}
                   hideFooter={true}
                 />
               ))}
