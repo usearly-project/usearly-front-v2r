@@ -1,9 +1,8 @@
 import React, { useCallback, useRef } from "react";
 import "./NewHomeAlternatif.scss";
-import Footer from "@src/components/layout/Footer";
+import UsearlyFooter from "@src/components/layout/UsearlyFooter";
 // import TitleSection from "@src/pages/aboutClassic/components/TitleSection";
 import ExtensionExample from "./components/extensionExample/ExtensionExample";
-import UsearlyDrawing from "@src/components/background/Usearly";
 // import Hero from "@src/pages/aboutClassic/components/Hero";
 import SectionHookUsers from "./components/sectionHookUsers/SectionHookUsers";
 import ScrollInlineImages from "./components/scroll-text/ScrollInlineImages";
@@ -70,10 +69,7 @@ const NewHome: React.FC = () => {
       <div className="new-home-main">
         <FavoriteCarouselSection />
         {/* <BrandCard /> */}
-        <div className="usearly-drawing-container">
-          <UsearlyDrawing animationDuration="25" />
-          <Footer />
-        </div>
+        <UsearlyFooter />
       </div>
 
       {isAtBottom && (

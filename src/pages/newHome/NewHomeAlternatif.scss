@@ -18,39 +18,6 @@
         flex-wrap: wrap;
       }
     }
-    .usearly-drawing-container {
-      position: relative;
-      width: 100vw;
-      background-color: #000;
-      --usearly-color: #ffffff4e;
-      overflow: hidden;
-
-      .usearly-wrap {
-        margin-top: 14rem !important;
-        margin-bottom: 14rem !important;
-        @media screen and (max-width: 600px) {
-          margin-top: 5rem;
-        }
-        .usearly-svg {
-          max-width: 1200px;
-        }
-      }
-    }
-    footer {
-      background-color: black;
-      color: #ffffff5e;
-      .footer-container {
-        ul {
-          margin-top: 50px;
-          font-size: 12px;
-          li {
-            a {
-              color: #ffffff5e !important;
-            }
-          }
-        }
-      }
-    }
   }
 
   .new-home-video-section {
