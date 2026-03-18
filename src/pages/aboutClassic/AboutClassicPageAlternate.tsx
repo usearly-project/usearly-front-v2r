@@ -4,6 +4,7 @@ import Hero from "./components/Hero";
 import SplitSection from "./components/SplitSection";
 import MarqueeBanner from "./components/MarqueeBanner";
 import ManifestoSection from "./components/ManifestoSection";
+import SectionTeam from "./components/SectionTeam/SectionTeam";
 import FooterWord from "./components/FooterWord";
 import Footer from "@src/components/layout/Footer";
 
@@ -26,6 +27,7 @@ const AboutClassicPage = () => {
       <SplitSection sectionRef={sectionRef} />
       <MarqueeBanner />
       <ManifestoSection />
+      <SectionTeam />
       <FooterWord />
       <Footer />
     </section>

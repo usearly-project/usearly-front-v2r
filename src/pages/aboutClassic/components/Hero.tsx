@@ -75,7 +75,7 @@ const Hero = ({ page }: Props) => {
       {page === "landing" && (
         <iframe
           className="about-classic__hero-video"
-          src="https://www.youtube.com/embed/QmFQRhUOns4?autoplay=1&mute=1&loop=1&playlist=QmFQRhUOns4&controls=0&modestbranding=1&playsinline=1"
+          src="https://www.youtube.com/embed/FkAnIL1l4wo?autoplay=1&mute=1&loop=1&playlist=FkAnIL1l4wo&controls=0&modestbranding=1"
           title="Usearly video"
           frameBorder="0"
           allow="autoplay; encrypted-media"
@@ -85,7 +85,7 @@ const Hero = ({ page }: Props) => {
       {page === "about" && (
         <iframe
           className="about-classic__hero-video"
-          src="https://www.youtube.com/embed/FkAnIL1l4wo?autoplay=1&mute=1&loop=1&playlist=FkAnIL1l4wo&controls=0&modestbranding=1"
+          src="https://www.youtube.com/embed/QmFQRhUOns4?autoplay=1&mute=1&loop=1&playlist=QmFQRhUOns4&controls=0&modestbranding=1&playsinline=1"
           title="Usearly video"
           frameBorder="0"
           allow="autoplay; encrypted-media"

@@ -1,13 +1,40 @@
 .extension-example-container {
   position: relative;
+  isolation: isolate;
   width: 100vw;
   // margin-left: calc(50% - 50vw);
   min-height: 100vh;
   padding: 150px 162px 100px 100px;
   display: flex;
   justify-content: space-between;
-  background: #191637;
+  background-color: #191637;
   overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    left: 68%;
+    height: 100%;
+    aspect-ratio: 15 / 13;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.12);
+    pointer-events: none;
+    z-index: 1;
+    -webkit-mask-image: url("/assets/U-score-icon.svg");
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: 100% 100%;
+    mask-image: url("/assets/U-score-icon.svg");
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: 100% 100%;
+  }
+
+  > :not(.img2) {
+    position: relative;
+    z-index: 2;
+  }
 
   @media screen and (max-width: 1193px) {
     flex-direction: column;
@@ -24,7 +51,7 @@
 }
 
 img.img2 {
-  z-index: 1;
+  z-index: 0;
   position: absolute;
   inset: 0;
   width: 90%;

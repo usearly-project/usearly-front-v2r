@@ -70,14 +70,6 @@ const SectionJoinUsearly = () => {
             emphasizeIcon={feature.emphasizeIcon}
           />
         ))}
-        <div className="section-join-usearly-features-box-cta">
-          <button
-            type="button"
-            className="section-join-usearly-features-box-cta-button"
-          >
-            En savoir plus
-          </button>
-        </div>
       </div>
     </section>
   );
