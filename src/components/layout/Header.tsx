@@ -97,7 +97,7 @@ const Header: React.FC<HeaderProps> = ({ heroMode = false, children }) => {
   }, []);
 
   useEffect(() => {
-    const isFeedbackRoute = location.pathname.startsWith("/feedback");
+    const isFeedbackRoute = location.pathname.startsWith("/");
     const mainElement = document.querySelector("main");
     const isScrollableElement = (element: HTMLElement) => {
       const styles = window.getComputedStyle(element);
@@ -248,15 +248,15 @@ const Header: React.FC<HeaderProps> = ({ heroMode = false, children }) => {
             Accueil
           </NavLink> */}
 
-          {isAuthenticated && (
+          {/* {isAuthenticated && (
             <NavLink
-              to="/feedback"
+              to="/public-feed"
               className="link"
               onClick={() => setMobileMenuOpen(false)}
             >
               Feel d'actu
             </NavLink>
-          )}
+          )} */}
 
           {isAuthenticated && (
             <NavLink
@@ -267,7 +267,13 @@ const Header: React.FC<HeaderProps> = ({ heroMode = false, children }) => {
               Mes feedbacks
             </NavLink>
           )}
-
+          <NavLink
+            to="/"
+            className="link"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Feel d'actu
+          </NavLink>
           <NavLink
             to="/about"
             className="link"

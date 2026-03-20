@@ -26,6 +26,7 @@ interface Props {
   onCommentCountChange?: (count: number) => void;
   onCommentAddedOrDeleted?: () => void;
   onCommentsUpdate?: (newCount: number) => void;
+  isPublic?: boolean;
 }
 
 const DescriptionCommentSection: React.FC<Props> = ({
@@ -48,6 +49,7 @@ const DescriptionCommentSection: React.FC<Props> = ({
   onCommentCountChange,
   /* onCommentAddedOrDeleted, */
   onCommentsUpdate,
+  isPublic = false,
 }) => {
   const [localRefreshKey, setLocalRefreshKey] = useState(0);
   // Choix entre prop et état local
@@ -69,8 +71,14 @@ const DescriptionCommentSection: React.FC<Props> = ({
   }, [comments.length]);
 
   const toggleComments = () => {
+    if (isPublic) {
+      window.dispatchEvent(new Event("USEARLY_OPEN_LOGIN"));
+      return;
+    }
+
     const newState = !showComments;
     setShowComments(newState);
+
     if (newState) {
       onOpen?.();
       onOpenSimilarReports?.();
@@ -117,7 +125,7 @@ const DescriptionCommentSection: React.FC<Props> = ({
           {triggerType === "text" ? (
             <div className="reaction-comment-row">
               <DescriptionReactionSelector
-                userId={userId}
+                userId={isPublic ? "" : userId}
                 descriptionId={descriptionId}
                 type={type}
                 displayAsTextLike
@@ -172,6 +180,7 @@ const DescriptionCommentSection: React.FC<Props> = ({
           brandSiteUrl={brandSiteUrl}
           brandResponse={brandResponse}
           reportIds={reportIds}
+          readOnly={isPublic}
           onCommentAdded={() => setLocalRefreshKey((k) => k + 1)}
           onCommentDeleted={() => setLocalRefreshKey((k) => k + 1)}
         />

@@ -1,0 +1,31 @@
+.public-feed-page {
+  display: flex;
+  flex-direction: column; // IMPORTANT
+  width: 100%;
+}
+
+.public-feed-left {
+  z-index: auto;
+}
+
+.public-feed-center {
+  z-index: auto;
+}
+
+.public-feed-right {
+  z-index: auto;
+}
+.public-feed-center {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.public-feed-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) 1fr minmax(280px, 320px);
+  gap: 24px;
+
+  max-width: 1400px;
+  margin: auto;
+  padding: 24px;
+}

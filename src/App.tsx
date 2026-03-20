@@ -34,13 +34,31 @@ import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
 import Terms from "./pages/legal/Terms";
 import Support from "./pages/legal/Support";
 import Contact from "./pages/legal/Contact";
+import PublicFeed from "./pages/public/PublicFeed";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <Router>
       <AuthProvider>
+        <Toaster
+          position="bottom-left"
+          gutter={8}
+          containerStyle={{ bottom: 20, left: 20 }}
+          toastOptions={{
+            duration: 3000,
+            style: {
+              borderRadius: "10px",
+              background: "#1a1a1a",
+              color: "#fff",
+              padding: "10px 14px",
+              zIndex: 2147483647,
+            },
+          }}
+        />
         <Layout>
           <Routes>
+            <Route path="/" element={<PublicFeed />} />
             <Route
               path="/signup"
               element={

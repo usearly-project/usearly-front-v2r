@@ -56,6 +56,7 @@ export const usePaginatedGroupedReportsByDate = (
             capture: report.capture || null,
             totalCount: report.count,
             status: report.status,
+            solutionsCount: report.solutionsCount ?? 0,
             hasBrandResponse: normalizeBrandResponse(report.hasBrandResponse, {
               brand: report.marque,
               siteUrl: report.siteUrl ?? null,

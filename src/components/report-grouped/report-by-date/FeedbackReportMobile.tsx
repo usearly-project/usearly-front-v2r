@@ -146,6 +146,7 @@ const FeedbackReportMobile: React.FC<Props> = ({
 
           <ReportActionsBarWithReactions
             userId={userId}
+            type="report"
             descriptionId={descriptionId}
             hasBrandResponse={item.hasBrandResponse}
             reportsCount={item.subCategory.count}

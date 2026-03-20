@@ -8,13 +8,13 @@ interface Props {
   onToggle: (id: string) => void;
 }
 
-const FeedbackCardMobile: React.FC<Props> = ({ item, isOpen, onToggle }) => {
+const FeedbackCardMobile: React.FC<Props> = ({ item, isOpen }) => {
   return (
     <div className="feedback-card-mobile-root">
       <InteractiveFeedbackCard
         item={item}
         isOpen={isOpen}
-        onToggle={onToggle}
+        //onToggle={onToggle}
         addClassName="feedback-card-mobile-shell"
       />
     </div>

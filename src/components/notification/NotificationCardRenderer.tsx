@@ -19,7 +19,7 @@ const NotificationCardRenderer: React.FC<Props> = ({ notif, isOpen }) => {
           item={{ ...notif.suggestion, type: "suggestion" }}
           {...openProps}
           isOpen={isOpen ?? true}
-          onToggle={() => {}}
+          //onToggle={() => {}}
         />
       </div>
     );
@@ -33,7 +33,7 @@ const NotificationCardRenderer: React.FC<Props> = ({ notif, isOpen }) => {
           item={{ ...notif.coupDeCoeur, type: "coupdecoeur" }}
           {...openProps}
           isOpen={isOpen ?? true}
-          onToggle={() => {}}
+          //onToggle={() => {}}
         />
       </div>
     );

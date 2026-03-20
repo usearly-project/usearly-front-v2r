@@ -1,50 +1,4 @@
 // ====================
-// ✅ Liste de logos statiques connus
-// ====================
-/* export const staticLogos: Record<string, string> = {
-  apple: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
-  samsung: "https://companieslogo.com/img/orig/005930.KS-7e02a593.png?t=1728583894",
-  nike: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
-  adidas: "https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg",
-  amazon: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-  google: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg",
-  microsoft: "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
-  sony: "https://upload.wikimedia.org/wikipedia/commons/2/20/Sony_Logo.svg",
-  zalando: "https://companieslogo.com/img/orig/ZALANDO.D-46b0b08a.png?t=1728583894",
-  shein: "https://companieslogo.com/img/orig/SHEIN-5663e7b8.png?t=1728583894",
-  asos: "https://companieslogo.com/img/orig/ASOS.L-df234db6.png?t=1728583894",
-  vinted: "https://companieslogo.com/img/orig/VINTED-9fda6d36.png?t=1728583894",
-  ebay: "https://upload.wikimedia.org/wikipedia/commons/1/1b/EBay_logo.svg",
-  etsy: "https://upload.wikimedia.org/wikipedia/commons/8/8f/Etsy_logo.svg",
-  boursorama: "https://upload.wikimedia.org/wikipedia/fr/3/30/Boursorama_Banque_Logo.svg",
-  lcl: "https://companieslogo.com/img/orig/LCL.PA-065d86eb.png?t=1728583894",
-  bnp: "https://companieslogo.com/img/orig/BNP.PA-d4e51e5d.png?t=1728583894",
-  societe_generale: "https://companieslogo.com/img/orig/GLE.PA-37e9f8aa.png?t=1728583894",
-  fortuneo: "https://companieslogo.com/img/orig/FORTUNEO-ec3c5b78.png?t=1728583894",
-  revolut: "https://companieslogo.com/img/orig/REVOLUT-1b17a3b1.png?t=1728583894",
-  dyson: "https://upload.wikimedia.org/wikipedia/commons/6/6b/Dyson_logo.svg",
-  mistral: "https://vectorwiki.com/images/mUccB__mistral-ai.svg",
-  decathlon: "https://upload.wikimedia.org/wikipedia/commons/4/4f/Decathlon_Logo.svg",
-  ikea: "https://upload.wikimedia.org/wikipedia/commons/4/48/Ikea_logo.svg",
-  carrefour: "https://upload.wikimedia.org/wikipedia/commons/9/94/Carrefour_logo.svg",
-  leclerc: "https://upload.wikimedia.org/wikipedia/commons/6/65/Logo_E.Leclerc.svg",
-  auchan: "https://upload.wikimedia.org/wikipedia/commons/0/0d/Auchan_logo.svg",
-  netflix: "https://upload.wikimedia.org/wikipedia/commons/7/75/Netflix_icon.svg",
-  spotify: "https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg",
-  disney: "https://upload.wikimedia.org/wikipedia/commons/d/df/Walt_Disney_Pictures_Logo.svg",
-  orange: "https://upload.wikimedia.org/wikipedia/commons/4/43/Orange_logo.svg",
-  sfr: "https://companieslogo.com/img/orig/SFR.PA-4d1883e8.png?t=1728583894",
-  bouygues: "https://upload.wikimedia.org/wikipedia/commons/a/a3/Bouygues_Telecom_logo.svg",
-  free: "https://upload.wikimedia.org/wikipedia/commons/6/66/Free_logo.svg",
-  renault: "https://upload.wikimedia.org/wikipedia/commons/0/09/Renault_2021.svg",
-  peugeot: "https://upload.wikimedia.org/wikipedia/commons/8/87/Peugeot_Logo_2021.svg",
-  tesla: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Tesla_Motors.svg",
-  bmw: "https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg",
-  mercedes: "https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg",
-  toyota: "https://upload.wikimedia.org/wikipedia/commons/9/9d/Toyota_carlogo.svg",
-}; */
-
-// ====================
 // ✅ Placeholder générique
 // ====================
 const placeholderSvg =
@@ -78,10 +32,14 @@ export function normalizeDomain(siteUrl?: string): string {
 // ✅ Méthode principale
 // ====================
 export async function fetchValidBrandLogo(
-  brand: string,
+  brand?: string,
   siteUrl?: string,
 ): Promise<string> {
-  const cacheKey = `${brand.toLowerCase().trim()}|${siteUrl ?? ""}`;
+  if (!brand) return FALLBACK_BRAND_PLACEHOLDER;
+
+  const safeBrand = brand.toLowerCase().trim();
+
+  const cacheKey = `${safeBrand}|${siteUrl ?? ""}`;
   if (brandLogoCache.has(cacheKey)) return brandLogoCache.get(cacheKey)!;
 
   const normalizedBrand = brand.toLowerCase().trim();
@@ -112,11 +70,17 @@ export async function fetchValidBrandLogo(
 // ====================
 // ✅ Accès direct (synchrone)
 // ====================
-export function getBrandLogo(brand: string, siteUrl?: string): string {
+export function getBrandLogo(brand?: string, siteUrl?: string): string {
+  // ✅ sécurité totale
+  if (!brand || typeof brand !== "string") {
+    return FALLBACK_BRAND_PLACEHOLDER;
+  }
+
   const key = brand.toLowerCase().trim();
+
   if (!key) return FALLBACK_BRAND_PLACEHOLDER;
 
-  //if (staticLogos[key]) return staticLogos[key];
   const domain = siteUrl ? normalizeDomain(siteUrl) : `${key}.com`;
+
   return `${API_BASE_URL}/api/logo?domain=${domain}`;
 }

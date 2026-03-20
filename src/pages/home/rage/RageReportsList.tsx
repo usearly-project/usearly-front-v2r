@@ -44,6 +44,10 @@ const RageReportsList = ({
     siteUrl: r.siteUrl ?? undefined,
     totalCount: r.count,
     reactions: [],
+
+    // 🔥 AJOUT CRITIQUE
+    solutionsCount: r.solutionsCount ?? 0,
+
     hasBrandResponse: normalizeBrandResponse(
       brandResponsesMap[String(r.reportingId)],
       {
@@ -51,31 +55,37 @@ const RageReportsList = ({
         siteUrl: r.siteUrl ?? null,
       },
     ),
+
     subCategory: {
       subCategory: r.subCategory,
       status: r.status,
       count: r.count,
-      descriptions: r.descriptions as any,
+      descriptions: (r.descriptions ?? []).map((d: any) => ({
+        ...d,
+        author: d.author ?? {
+          id: d.userId ?? "",
+          pseudo: d.pseudo ?? "Utilisateur",
+          avatar: d.avatar ?? null,
+        },
+      })),
     },
+
     subCategories: [
       {
         subCategory: r.subCategory,
         status: r.status,
         count: r.count,
-        descriptions: r.descriptions as any,
+        descriptions: (r.descriptions ?? []).map((d: any) => ({
+          ...d,
+          author: d.author ?? {
+            id: d.userId ?? "",
+            pseudo: d.pseudo ?? "Utilisateur",
+            avatar: d.avatar ?? null,
+          },
+        })),
       },
     ],
   }));
-
-  console.log("🔥 RAGE brandResponsesMap", brandResponsesMap);
-
-  console.log(
-    "🔥 RAGE explodedData",
-    explodedData.map((r) => ({
-      id: r.reportingId,
-      hasBrandResponse: r.hasBrandResponse,
-    })),
-  );
 
   return (
     <ReportListView

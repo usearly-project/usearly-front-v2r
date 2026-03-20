@@ -91,15 +91,16 @@ const ReportListView: React.FC<Props> = ({
       <ChronologicalReportList
         groupedByDay={groupedByDay}
         renderCard={(item) => {
-          // ✅ item: PopularGroupedReport
           const key = `${item.reportingId}-${item.subCategory}`;
+          console.log("ITEM DANS RENDERCARD 👉", item); // 🔥 IMPORTANT
           return (
             <PopularReportCard
               key={key}
               item={item}
-              isOpen={!!expandedItems[key]}
-              onToggle={() => handleToggle(key)}
+              isOpen={true}
+              //onToggle={() => handleToggle(key)}
               isHot={filter === "hot"}
+              onOpenSolutionModal={() => {}}
             />
           );
         }}
@@ -195,6 +196,7 @@ const ReportListView: React.FC<Props> = ({
             descriptions={item.subCategory.descriptions}
             siteUrl={item.siteUrl || undefined}
             hasBrandResponse={item.hasBrandResponse}
+            solutionsCount={item.solutionsCount}
             /* capture={item.capture || null} */
             hideFooter={true}
           />

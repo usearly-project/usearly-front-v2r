@@ -232,7 +232,7 @@ const FeedbackView = ({
             key={item.id || `feedback-${index}`}
             item={safeItem}
             isOpen={openId === item.id}
-            onToggle={(id) => setOpenId((prev) => (prev === id ? null : id))}
+            //onToggle={(id) => setOpenId((prev) => (prev === id ? null : id))}
           />
         );
       })}

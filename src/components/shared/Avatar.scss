@@ -1,7 +1,3 @@
-@use "@src/styles/base/variables" as *;
-@use "@src/styles/utils/mixins" as *;
-
-// ✅ Conteneur (fond clair par défaut pour éviter le flash noir)
 .avatar-wrapper-custom {
   display: flex;
   align-items: center;

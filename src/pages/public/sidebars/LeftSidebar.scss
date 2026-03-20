@@ -1,0 +1,181 @@
+.left-sidebar {
+  position: relative;
+  background: #f7f7f7;
+  padding: 22px;
+  border-radius: 16px;
+  border: 1px solid #e6e6e6;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  z-index: 21;
+}
+
+/* 🔥 TITLE */
+.left-sidebar h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  line-height: 1.4;
+}
+
+/* 🔥 ROW */
+.brand-row {
+  margin-bottom: 20px;
+  transition: transform 0.2s ease;
+}
+
+.brand-row-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-info {
+  flex: 1;
+}
+
+/* 🔥 LABEL */
+.brand-label {
+  font-size: 13px;
+  color: #6b6b6b;
+}
+
+/* 🔥 SCORE */
+.progress-score {
+  font-size: 13px;
+  font-weight: 500;
+  color: #000;
+}
+
+/* 🔥 BAR */
+.brand-progress {
+  margin-top: 6px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #dedede;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.brands-list {
+  max-height: 260px; // 🔥 ajuste selon ton design
+  overflow-y: auto;
+  overflow-x: visible;
+  padding-right: 4px;
+  position: relative;
+  z-index: 1;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: #7da6ff;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+.brands-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.brands-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+/* 🔥 TOP BRAND */
+.brand-row.top {
+  .brand-label {
+    font-weight: 600;
+    color: #000;
+  }
+
+  .progress-bar-fill {
+    background: #5c8cff;
+  }
+}
+
+/* 🔥 BUTTON */
+.see-all {
+  margin: 18px auto;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid #000;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #000;
+    color: white;
+  }
+}
+
+/* 🔥 TEXT */
+.sidebar-text {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* 🔥 EMPTY */
+.empty {
+  font-size: 14px;
+  color: #777;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.see-all-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.see-all-tooltip {
+  position: absolute;
+  bottom: 110%; // 🔥 au-dessus du bouton
+  left: 50%;
+  transform: translateX(-50%);
+
+  background: #1f1f1f;
+  color: white;
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+
+  animation: fadeIn 0.2s ease;
+}
+
+/* 🔥 petite flèche */
+.see-all-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  border-width: 6px;
+  border-style: solid;
+  border-color: #1f1f1f transparent transparent transparent;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 4px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+.see-all-tooltip {
+  max-width: 220px;
+  text-align: center;
+  white-space: normal;
+}

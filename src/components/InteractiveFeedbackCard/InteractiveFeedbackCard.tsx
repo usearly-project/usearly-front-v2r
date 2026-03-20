@@ -13,14 +13,14 @@ import CloseButton from "@src/components/buttons/CloseButtons";
 interface Props {
   item: (CoupDeCoeur | Suggestion) & { type: "suggestion" | "coupdecoeur" };
   isOpen: boolean;
-  onToggle: (id: string) => void;
+  //onToggle: (id: string) => void;
   addClassName?: string;
 }
 
 const InteractiveFeedbackCard: React.FC<Props> = ({
   item,
   isOpen,
-  onToggle,
+  //onToggle,
   addClassName,
 }) => {
   const { userProfile, isLoading } = useAuth();
@@ -123,7 +123,7 @@ const InteractiveFeedbackCard: React.FC<Props> = ({
         {/* === Bloc droit === */}
         <FeedbackRight
           item={safeItem}
-          onToggle={onToggle}
+          //onToggle={onToggle}
           userProfile={userProfile}
           selectedImage={selectedImage}
           setSelectedImage={setSelectedImage}

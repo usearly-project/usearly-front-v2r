@@ -1,27 +1,29 @@
 import { useEffect, useMemo, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import DescriptionCommentSection from "@src/components/report-desc-comment/DescriptionCommentSection";
-import ReportActionsBarWithReactions from "@src/components/shared/ReportActionsBarWithReactions";
-import { getCategoryIconPathFromSubcategory } from "@src/utils/IconsUtils";
 import { useAuth } from "@src/services/AuthContext";
 import { useCommentsForDescription } from "@src/hooks/useCommentsForDescription";
 import type { PopularGroupedReport } from "@src/types/Reports";
 import "./PopularReportCard.scss";
 import "@src/pages/home/confirm-reportlist/FlatSubcategoryBlock.scss";
 import { getBrandLogo } from "@src/utils/brandLogos";
-import Avatar from "@src/components/shared/Avatar";
-import UserBrandLine from "@src/components/shared/UserBrandLine";
-import CloseButton from "@src/components/buttons/CloseButtons";
 import { useBrandResponsesMap } from "@src/hooks/useBrandResponsesMap";
 import { normalizeBrandResponse } from "@src/utils/brandResponse";
+import PopularReportHeader from "./popular-report-header/PopularReportHeader";
+import PopularReportContent from "./popular-report-header/PopularReportContent";
+import PopularReportLightbox from "./popular-report-header/PopularReportLightbox";
+import PopularReportActions from "./popular-report-header/PopularReportActions";
+import PopularReportComments from "./popular-report-header/PopularReportComments";
+import PopularReportSimilar from "./popular-report-header/PopularReportSimilar";
+import SolutionModal from "@src/components/ui/SolutionModal";
+import SolutionsModal from "@src/components/ui/SolutionsModal";
 
 interface Props {
   item: PopularGroupedReport;
   isOpen: boolean;
-  onToggle: () => void;
   isHot?: boolean;
+  isPublic?: boolean;
+  onOpenSolutionModal: () => void;
 }
 
 const DESCRIPTION_PREVIEW_LENGTH = 100;
@@ -29,8 +31,8 @@ const DESCRIPTION_PREVIEW_LENGTH = 100;
 const PopularReportCard: React.FC<Props> = ({
   item,
   isOpen,
-  onToggle,
   isHot,
+  isPublic = false,
 }) => {
   const { userProfile } = useAuth();
   const [showComments, setShowComments] = useState(false);
@@ -44,11 +46,32 @@ const PopularReportCard: React.FC<Props> = ({
   const [showCapturePreview, setShowCapturePreview] = useState(false);
   const firstDescription = item.descriptions?.[0];
   const descriptionId = firstDescription?.id ?? "";
+  const [showSolutionModal, setShowSolutionModal] = useState(false);
+  const [showSolutionsList, setShowSolutionsList] = useState(false);
+  const [solutionsCount, setSolutionsCount] = useState(
+    item.solutionsCount ?? 0,
+  );
+  const shouldFetchComments = !isPublic && descriptionId;
+
   const { comments, loading } = useCommentsForDescription(
-    descriptionId,
+    shouldFetchComments ? descriptionId : undefined,
     "report",
     refreshKey,
   );
+  /*   const { comments, loading } = useCommentsForDescription(
+    descriptionId,
+    "report",
+    refreshKey,
+  ); */
+  const latestDate = useMemo(() => {
+    if (!item.descriptions?.length) return null;
+
+    const latest = item.descriptions.reduce((acc, curr) => {
+      return new Date(curr.createdAt) > new Date(acc.createdAt) ? curr : acc;
+    });
+
+    return latest.createdAt;
+  }, [item.descriptions]);
 
   useEffect(() => {
     if (!loading) {
@@ -88,20 +111,17 @@ const PopularReportCard: React.FC<Props> = ({
     return `${truncated}${suffix} ${firstDescription.emoji || ""}`.trim();
   }, [firstDescription?.description, firstDescription?.emoji, showFullText]);
 
-  const reportIds = item.reportingId ? [item.reportingId] : [];
+  //const reportIds = item.reportingId ? [item.reportingId] : [];
+  const reportIds = !isPublic && item.reportingId ? [item.reportingId] : [];
 
   const { brandResponsesMap } = useBrandResponsesMap(reportIds);
-
-  if (!firstDescription) return null;
-
-  const hasBrandResponse = normalizeBrandResponse(
-    brandResponsesMap[item.reportingId],
-    {
-      brand: item.marque,
-      siteUrl: item.siteUrl ?? null,
-      avatar: getBrandLogo(item.marque, item.siteUrl ?? undefined),
-    },
-  );
+  const hasBrandResponse = !isPublic
+    ? normalizeBrandResponse(brandResponsesMap[item.reportingId], {
+        brand: item.marque,
+        siteUrl: item.siteUrl ?? null,
+        avatar: getBrandLogo(item.marque, item.siteUrl ?? undefined),
+      })
+    : undefined;
 
   const author: {
     id: string;
@@ -119,16 +139,14 @@ const PopularReportCard: React.FC<Props> = ({
   const brandLogo = getBrandLogo(item.marque, item.siteUrl ?? undefined);
   const captureUrl = firstDescription.capture ?? null;
   const additionalDescriptions = item.descriptions.slice(1);
-  const hasMoreThanTwo = additionalDescriptions.length > 2;
-  //const isCurrentUser = author.id === userProfile?.id;
-
-  const handleHeaderClick = () => {
-    onToggle();
-  };
 
   const handleCommentClick = () => {
+    if (isPublic) {
+      window.dispatchEvent(new Event("USEARLY_OPEN_LOGIN"));
+      // MAIS on continue quand même
+    }
+
     if (!isOpen) {
-      onToggle();
       setShowComments(true);
       setShowSimilarReports(false);
       return;
@@ -137,9 +155,15 @@ const PopularReportCard: React.FC<Props> = ({
     setShowComments((prev) => !prev);
   };
 
+  useEffect(() => {
+    setSolutionsCount(item.solutionsCount ?? 0);
+  }, [item.solutionsCount]);
+
+  if (!firstDescription) return null;
+
   const handleToggleSimilarReports = () => {
     if (!isOpen) {
-      onToggle();
+      //onToggle();
       setShowSimilarReports(true);
       setShowComments(false);
       return;
@@ -151,235 +175,102 @@ const PopularReportCard: React.FC<Props> = ({
     }
   };
 
+  const formattedShortDate = latestDate
+    ? formatDistanceToNow(new Date(latestDate), {
+        locale: fr,
+        addSuffix: false,
+      })
+        .replace("environ ", "")
+        .replace("il y a ", "")
+    : "";
+
   return (
     <div
       className={`subcategory-block flat ${isOpen ? "open" : ""} ${isHot ? "hot-effect" : ""}`}
       data-description-id={descriptionId}
     >
-      <div className="subcategory-header" onClick={handleHeaderClick}>
-        <div className="subcategory-left">
-          <img
-            src={getCategoryIconPathFromSubcategory(item.subCategory)}
-            alt={item.subCategory}
-            className="subcategory-icon"
-          />
-          <div className="subcategory-text">
-            <div className="subcategory-title-row">
-              <h4>{item.subCategory || "Signalement"}</h4>
-              {item.count > 1 && (
-                <span className="count-badge">{item.count}</span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="subcategory-right">
-          {isOpen ? (
-            <div className="expanded-header">
-              <div className="avatar-logo-group">
-                <Avatar
-                  avatar={author.avatar}
-                  pseudo={author.pseudo}
-                  type="user"
-                  className="user-avatar"
-                  wrapperClassName="user-avatar-wrapper"
-                />
-                <Avatar
-                  avatar={brandLogo}
-                  pseudo={item.marque}
-                  type="brand"
-                  className="brand-logo"
-                  wrapperClassName="brand-logo-wrapper"
-                />
-              </div>
-              <div className="text-meta">
-                <UserBrandLine
-                  userId={author.id}
-                  email={author?.email}
-                  pseudo={author.pseudo}
-                  brand={item.marque}
-                  type="report"
-                />
-              </div>
-              <ChevronUp size={16} />
-            </div>
-          ) : (
-            <div className="collapsed-header">
-              <span className="date-subcategory">
-                {formatDistanceToNow(new Date(firstDescription.createdAt), {
-                  locale: fr,
-                  addSuffix: true,
-                }).replace("environ ", "")}
-              </span>
-              <Avatar
-                avatar={brandLogo}
-                pseudo={item.marque}
-                type="brand"
-                className="brand-logo"
-                wrapperClassName="avatars"
-              />
-              <ChevronDown size={16} />
-            </div>
-          )}
-        </div>
-      </div>
+      <PopularReportHeader
+        item={item}
+        isOpen={isOpen}
+        author={author}
+        brandLogo={brandLogo}
+        formattedShortDate={formattedShortDate}
+        firstDescription={firstDescription}
+      />
 
       {isOpen && (
         <div className="subcategory-content">
-          <div className="main-description">
-            <div className="description-text">
-              <span className="description-content">{descriptionText}</span>
-
-              {showFullText && captureUrl && (
-                <div className="inline-capture">...</div>
-              )}
-
-              {(firstDescription.description.length >
-                DESCRIPTION_PREVIEW_LENGTH ||
-                captureUrl) && (
-                <div
-                  className={`see-more-section ${showFullText ? "expanded" : ""}`}
-                >
-                  {showFullText && <br />}
-                  <button
-                    className={`see-more-button ${showFullText ? "expanded" : ""}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowFullText((prev) => !prev);
-                    }}
-                  >
-                    {showFullText ? "Voir moins" : "Voir plus"}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <ReportActionsBarWithReactions
-            userId={userProfile?.id || ""}
-            descriptionId={descriptionId}
-            reportsCount={item.count}
-            status={item.status}
-            hasBrandResponse={hasBrandResponse}
-            commentsCount={currentCount}
-            onReactClick={() => {}}
-            onCommentClick={handleCommentClick}
-            onToggleSimilarReports={handleToggleSimilarReports}
+          <PopularReportContent
+            descriptionText={descriptionText}
+            showFullText={showFullText}
+            setShowFullText={setShowFullText}
+            captureUrl={captureUrl}
+            descriptionLength={firstDescription.description.length}
+            previewLength={DESCRIPTION_PREVIEW_LENGTH}
+            setShowCapturePreview={setShowCapturePreview}
           />
 
-          {showComments && userProfile?.id && (
-            <DescriptionCommentSection
-              userId={userProfile.id}
-              descriptionId={descriptionId}
-              type="report"
-              hideFooter={true}
-              forceOpen={true}
-              onCommentCountChange={(count) =>
-                setLocalCommentsCounts((prev) => ({
-                  ...prev,
-                  [descriptionId]: count,
-                }))
+          <PopularReportActions
+            userProfile={userProfile}
+            descriptionId={descriptionId}
+            item={item}
+            solutionsCount={solutionsCount}
+            hasBrandResponse={hasBrandResponse}
+            currentCount={currentCount}
+            handleCommentClick={handleCommentClick}
+            handleToggleSimilarReports={handleToggleSimilarReports}
+            onOpenSolutionModal={() => {
+              if (solutionsCount > 0) {
+                setShowSolutionsList(true); // ✅ ouvre la liste
+              } else {
+                setShowSolutionModal(true); // ✅ propose une solution
               }
-              onCommentAddedOrDeleted={() => setRefreshKey((prev) => prev + 1)}
-            />
-          )}
+            }}
+            isPublic={isPublic}
+          />
+          <PopularReportComments
+            userProfile={userProfile}
+            descriptionId={descriptionId}
+            showComments={showComments}
+            setLocalCommentsCounts={setLocalCommentsCounts}
+            setRefreshKey={setRefreshKey}
+          />
 
-          {showSimilarReports && additionalDescriptions.length > 0 && (
-            <div className="other-descriptions">
-              {additionalDescriptions
-                .slice(0, visibleDescriptionsCount)
-                .map((desc) => {
-                  const secondaryAuthor = desc.author ?? {
-                    id: "",
-                    pseudo: "Utilisateur",
-                    avatar: null,
-                  };
-                  return (
-                    <div key={desc.id} className="feedback-card">
-                      <div className="feedback-avatar">
-                        <div className="feedback-avatar-wrapper">
-                          <Avatar
-                            avatar={secondaryAuthor.avatar}
-                            pseudo={secondaryAuthor.pseudo}
-                            type="user"
-                            className="avatar"
-                            wrapperClassName="avatar-wrapper-override"
-                          />
-                          {desc.emoji && (
-                            <div className="emoji-overlay">{desc.emoji}</div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="feedback-content">
-                        <div className="feedback-meta">
-                          <span className="pseudo">
-                            {secondaryAuthor.pseudo}
-                          </span>
-                          <span className="brand"> · {item.marque}</span>
-                          <span className="time">
-                            ·{" "}
-                            {formatDistanceToNow(new Date(desc.createdAt), {
-                              locale: fr,
-                              addSuffix: true,
-                            })}
-                          </span>
-                        </div>
-                        <p className="feedback-text">{desc.description}</p>
-
-                        <DescriptionCommentSection
-                          userId={secondaryAuthor.id}
-                          descriptionId={desc.id}
-                          type="report"
-                          modeCompact
-                          triggerType="text"
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-
-              {hasMoreThanTwo && (
-                <div className="see-more-toggle">
-                  {visibleDescriptionsCount < additionalDescriptions.length ? (
-                    <button
-                      className="see-more-descriptions"
-                      onClick={() =>
-                        setVisibleDescriptionsCount((prev) =>
-                          Math.min(prev + 2, additionalDescriptions.length),
-                        )
-                      }
-                    >
-                      Voir plus
-                    </button>
-                  ) : (
-                    <>
-                      <button
-                        className="see-more-descriptions"
-                        onClick={() => setVisibleDescriptionsCount(2)}
-                      >
-                        Voir moins
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+          <PopularReportSimilar
+            additionalDescriptions={additionalDescriptions}
+            visibleDescriptionsCount={visibleDescriptionsCount}
+            setVisibleDescriptionsCount={setVisibleDescriptionsCount}
+            isPublic={isPublic}
+            item={item}
+            showSimilarReports={showSimilarReports}
+          />
         </div>
       )}
       {showCapturePreview && (
-        <div className="lightbox" onClick={() => setShowCapturePreview(false)}>
-          <div
-            className="lightbox-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <CloseButton
-              stateSetter={setShowCapturePreview}
-              stateValue={false}
-            />
-            <img src={captureUrl ?? ""} alt="Aperçu capture" />
-          </div>
-        </div>
+        <PopularReportLightbox
+          captureUrl={captureUrl}
+          onClose={() => setShowCapturePreview(false)}
+        />
+      )}
+
+      {showSolutionModal && (
+        <SolutionModal
+          reportId={item.reportingId}
+          onClose={() => setShowSolutionModal(false)}
+          onSuccess={() => {
+            setSolutionsCount((prev) => prev + 1);
+          }}
+        />
+      )}
+      {showSolutionsList && (
+        <SolutionsModal
+          reportId={item.reportingId}
+          onClose={() => setShowSolutionsList(false)}
+          onAddSolution={() => {
+            setShowSolutionsList(false);
+            setShowSolutionModal(true);
+          }}
+        />
       )}
     </div>
   );

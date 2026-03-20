@@ -21,15 +21,20 @@ const HotReportsList = ({
     const result: Record<string, PopularGroupedReport[]> = {};
 
     // 🔥 CAS 1 : déjà groupé par date
-    if (data && typeof data === "object" && !Array.isArray(data)) {
+    if (
+      data &&
+      typeof data === "object" &&
+      !Array.isArray(data) &&
+      Object.values(data).every((v) => Array.isArray(v))
+    ) {
       Object.entries(data).forEach(([date, items]) => {
-        if (!Array.isArray(items)) return;
-
         result[date] = items.map((item) => ({
           ...item,
+          descriptions: Array.isArray(item.descriptions)
+            ? item.descriptions
+            : [],
           createdAt: item.descriptions?.[0]?.createdAt,
           description: item.descriptions?.[0]?.description,
-          descriptions: item.descriptions ?? [],
           reactions: item.descriptions?.[0]?.reactions ?? [],
         }));
       });
@@ -47,9 +52,11 @@ const HotReportsList = ({
 
         result[date].push({
           ...item,
+          descriptions: Array.isArray(item.descriptions)
+            ? item.descriptions
+            : [],
           createdAt: item.descriptions?.[0]?.createdAt,
           description: item.descriptions?.[0]?.description,
-          descriptions: item.descriptions ?? [],
           reactions: item.descriptions?.[0]?.reactions ?? [],
         });
       });

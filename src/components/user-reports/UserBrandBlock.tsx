@@ -14,6 +14,8 @@ import Avatar from "../shared/Avatar";
 import { useAuth } from "@src/services/AuthContext";
 import UserBrandLine from "../shared/UserBrandLine";
 import CloseButton from "../buttons/CloseButtons";
+import SolutionModal from "../ui/SolutionModal";
+import SolutionsModal from "../ui/SolutionsModal";
 
 interface Props {
   brand: string;
@@ -43,7 +45,9 @@ const UserBrandBlock: React.FC<Props> = ({
     {},
   );
   const [showFullText, setShowFullText] = useState<Record<string, boolean>>({});
-
+  const [activeReportId, setActiveReportId] = useState<string | null>(null);
+  const [showSolutionModal, setShowSolutionModal] = useState(false);
+  const [showSolutionsList, setShowSolutionsList] = useState(false);
   const [, setCommentsCounts] = useState<Record<string, number>>({});
   const [localCommentsCounts, setLocalCommentsCounts] = useState<
     Record<string, number>
@@ -121,6 +125,7 @@ const UserBrandBlock: React.FC<Props> = ({
         <div className="subcategories-list">
           {reports.map((sub) => {
             const initialDescription = sub.descriptions[0];
+            const solutionsCount = sub.solutionsCount ?? 0;
             const safeAuthor = {
               id: initialDescription.author?.id ?? null,
               pseudo: initialDescription.author?.pseudo ?? "Utilisateur",
@@ -289,11 +294,13 @@ const UserBrandBlock: React.FC<Props> = ({
 
                     <ReportActionsBarWithReactions
                       userId={userProfile?.id || ""}
+                      type="report"
                       descriptionId={initialDescription.id}
                       status={sub.status}
                       reportsCount={sub.count}
                       hasBrandResponse={sub.hasBrandResponse}
                       commentsCount={currentCount}
+                      solutionsCount={solutionsCount}
                       onReactClick={() =>
                         setShowReactions((prev) => ({
                           ...prev,
@@ -313,6 +320,15 @@ const UserBrandBlock: React.FC<Props> = ({
                           [sub.subCategory]: !prev[sub.subCategory],
                         }));
                         setShowComments({});
+                      }}
+                      onOpenSolutionModal={() => {
+                        setActiveReportId(sub.reportingId);
+
+                        if (solutionsCount > 0) {
+                          setShowSolutionsList(true);
+                        } else {
+                          setShowSolutionModal(true);
+                        }
                       }}
                     />
 
@@ -522,6 +538,25 @@ const UserBrandBlock: React.FC<Props> = ({
             <img src={modalImage} alt="Aperçu capture" />
           </div>
         </div>
+      )}
+      {showSolutionModal && activeReportId && (
+        <SolutionModal
+          reportId={activeReportId}
+          onClose={() => setShowSolutionModal(false)}
+          onSuccess={() => {
+            // optionnel: refresh
+          }}
+        />
+      )}
+      {showSolutionsList && activeReportId && (
+        <SolutionsModal
+          reportId={activeReportId}
+          onClose={() => setShowSolutionsList(false)}
+          onAddSolution={() => {
+            setShowSolutionsList(false);
+            setShowSolutionModal(true);
+          }}
+        />
       )}
     </div>
   );

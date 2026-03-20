@@ -1,0 +1,109 @@
+.signalement-avatars {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* groupe avatars */
+
+.avatars-group {
+  display: flex;
+  align-items: center;
+}
+
+/* overlap comme Teams */
+
+.mini-avatar-wrapper {
+  position: relative;
+  margin-left: -6px;
+}
+
+.mini-avatar-wrapper:first-child {
+  margin-left: 0;
+}
+
+/* avatar */
+
+.mini-avatar-wrapper .avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+
+/* initiales (correction principale) */
+
+.mini-avatar-wrapper .avatar-initials {
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* tooltip style Teams */
+
+.mini-avatar-wrapper::after {
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f1f1f;
+  color: white;
+  font-size: 11px;
+  padding: 4px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* chevron */
+
+.mini-avatar-wrapper::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #1f1f1f transparent transparent transparent;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+/* hover */
+
+.mini-avatar-wrapper:hover::after,
+.mini-avatar-wrapper:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+.signalement-avatars {
+  .avatar-wrapper-custom {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #fff;
+  }
+
+  .avatar-fallback-custom {
+    font-size: 9px !important;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+}
+.avatars-group {
+  display: flex;
+  align-items: center;
+
+  .mini-avatar-wrapper {
+    margin-left: -6px;
+  }
+
+  .mini-avatar-wrapper:first-child {
+    margin-left: 0;
+  }
+}
+.signalement-count {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
