@@ -13,11 +13,21 @@
   --planet-pop-feed-surface: rgba(255, 255, 255, 1);
   --planet-pop-feed-border: rgba(0, 0, 0, 0.08);
   --planet-pop-feed-shadow: rgba(0, 0, 0, 0.05);
+  --planet-pop-feed-text: #fff;
   --planet-pop-feed-rotation: 0deg;
+  --planet-pop-feed-item-radius: 999px;
+  --planet-pop-feed-bubble-radius: 999px;
+  --planet-pop-feed-photo-radius: 999px;
   position: absolute;
   transform: translate(-50%, -50%);
   width: clamp(68px, 6.6vw, 112px);
-  border-radius: 999px;
+  border-radius: 30px;
+}
+
+.planet-pop-feed__item--pastel {
+  --planet-pop-feed-item-radius: 28px;
+  --planet-pop-feed-bubble-radius: 15px;
+  --planet-pop-feed-photo-radius: 26px;
 }
 
 /* Bubble stack */
@@ -54,12 +64,12 @@
   max-width: min(340px, calc(100vw - 32px));
   padding: 12px 10px 12px 35px;
   border: 3px solid var(--planet-pop-feed-border);
-  border-radius: 999px;
+  border-radius: var(--planet-pop-feed-bubble-radius);
   background: var(--planet-pop-feed-surface);
   box-shadow:
     0 0px 10px 1px var(--planet-pop-feed-shadow),
     0 0px 20px rgba(10, 18, 32, 0.08);
-  color: white;
+  color: var(--planet-pop-feed-text);
   backdrop-filter: blur(10px);
   opacity: 0;
   transform: translateY(16px) scale(0.92);
@@ -150,8 +160,12 @@
 
 /* Photo */
 .planet-pop-feed__photo-shell {
+  width: clamp(34px, 10vw, 90px);
+  height: clamp(34px, 10vw, 90px);
   overflow: hidden;
-  border-radius: 999px;
+  border: 3px solid var(--planet-pop-feed-photo-ring);
+  border-radius: var(--planet-pop-feed-photo-radius);
+  box-shadow: 0 14px 34px var(--planet-pop-feed-photo-shadow);
   transform: rotate(var(--planet-pop-feed-rotation));
   opacity: 0;
   animation: planet-pop-feed-photo-life 5s ease both;
@@ -161,7 +175,7 @@
 .planet-pop-feed__photo {
   display: block;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: 100%;
   object-fit: cover;
 }
 

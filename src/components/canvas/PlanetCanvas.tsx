@@ -5,6 +5,7 @@ import PlanetCanvasFeedItem from "./planetCanvas/PlanetCanvasFeedItem";
 import { PLANET_CANVAS_TRAIL_IMAGES } from "./planetCanvas/planetCanvasConfig";
 import { toCssSize } from "./planetCanvas/planetCanvasUtils";
 import usePlanetPopFeed from "./planetCanvas/usePlanetPopFeed";
+import type { PopFeedVariant } from "./planetCanvas/types";
 import "./PlanetCanvas.scss";
 
 type PlanetCanvasProps = {
@@ -13,6 +14,7 @@ type PlanetCanvasProps = {
   height?: number | string;
   className?: string;
   popFeed?: boolean;
+  popFeedVariant?: PopFeedVariant;
 };
 
 const CANVAS_STYLE: CSSProperties = {
@@ -26,6 +28,7 @@ const PlanetCanvas = ({
   height,
   className,
   popFeed = false,
+  popFeedVariant = "default",
 }: PlanetCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const feedItems = usePlanetPopFeed(popFeed);
@@ -51,7 +54,11 @@ const PlanetCanvas = ({
       {popFeed && (
         <div className="planet-pop-feed" aria-hidden="true">
           {feedItems.map((item) => (
-            <PlanetCanvasFeedItem key={item.id} item={item} />
+            <PlanetCanvasFeedItem
+              key={item.id}
+              item={item}
+              variant={popFeedVariant}
+            />
           ))}
         </div>
       )}

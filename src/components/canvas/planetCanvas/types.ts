@@ -1,4 +1,5 @@
 export type PopFeedTheme = "report" | "suggestion" | "coupDeCoeur";
+export type PopFeedVariant = "default" | "pastel";
 
 export type PlanetCanvasPosition = {
   x: number;
@@ -27,6 +28,20 @@ export type PlanetPopFeedThemeConfig = {
   surface: string;
   border: string;
   shadow: string;
-  messages: readonly string[];
-  linkedMessages?: readonly string[];
+};
+
+export type PlanetPopFeedBrandMessage = string | readonly string[];
+
+export type PlanetPopFeedBrandCopy = {
+  report: PlanetPopFeedBrandMessage;
+  reportLinked?: PlanetPopFeedBrandMessage;
+  suggestion: PlanetPopFeedBrandMessage;
+  coupDeCoeur: PlanetPopFeedBrandMessage;
+};
+
+export type PlanetPopFeedBrandConfig = {
+  id: string;
+  label: string;
+  image: string;
+  copy: PlanetPopFeedBrandCopy;
 };
