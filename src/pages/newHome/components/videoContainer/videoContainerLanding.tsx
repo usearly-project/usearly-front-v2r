@@ -9,24 +9,120 @@ import MuteIcon from "/assets/icons/muteIcon.svg";
 import VolumeIcon from "/assets/icons/volumeIcon.svg";
 
 const VIDEO_URL =
-  "https://lbcefcnvssyhlpsr.public.blob.vercel-storage.com/usearly-home.mp4";
-
-/* const VIDEO_URL = "https://lbcefcnvssyhlpsr.public.blob.vercel-storage.com/video-karine.mp4"; */
+  "https://www.youtube.com/embed/FkAnIL1l4wo?autoplay=1&mute=1&loop=1&playlist=FkAnIL1l4wo&controls=0&modestbranding=1";
 
 type WebkitDocument = Document & {
   webkitFullscreenElement?: Element | null;
   webkitExitFullscreen?: () => Promise<void> | void;
 };
 
-type WebkitVideoElement = HTMLVideoElement & {
-  webkitEnterFullscreen?: () => void;
-  webkitExitFullscreen?: () => void;
-  webkitDisplayingFullscreen?: boolean;
+type WebkitHTMLElement = HTMLElement & {
+  webkitRequestFullscreen?: () => Promise<void> | void;
 };
 
 type OrientationApi = {
   lock?: (orientation: "landscape" | "portrait") => Promise<void>;
   unlock?: () => void;
+};
+
+type YoutubePlayer = {
+  destroy: () => void;
+  getCurrentTime: () => number;
+  getDuration: () => number;
+  getPlayerState: () => number;
+  mute: () => void;
+  pauseVideo: () => void;
+  playVideo: () => void;
+  seekTo: (seconds: number, allowSeekAhead?: boolean) => void;
+  setVolume: (volume: number) => void;
+  unMute: () => void;
+};
+
+type YoutubePlayerReadyEvent = {
+  target: YoutubePlayer;
+};
+
+type YoutubePlayerStateChangeEvent = {
+  data: number;
+  target: YoutubePlayer;
+};
+
+type YoutubeNamespace = {
+  Player: new (
+    element: HTMLElement,
+    options: {
+      events?: {
+        onReady?: (event: YoutubePlayerReadyEvent) => void;
+        onStateChange?: (event: YoutubePlayerStateChangeEvent) => void;
+      };
+      height?: number | string;
+      playerVars?: Record<string, number | string>;
+      videoId: string;
+      width?: number | string;
+    },
+  ) => YoutubePlayer;
+  PlayerState: {
+    BUFFERING: number;
+    CUED: number;
+    ENDED: number;
+    PAUSED: number;
+    PLAYING: number;
+    UNSTARTED: number;
+  };
+};
+
+declare global {
+  interface Window {
+    YT?: YoutubeNamespace;
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+const YOUTUBE_VIDEO_ID = VIDEO_URL.match(/\/embed\/([^?&]+)/)?.[1] ?? "";
+const VIDEO_URL_PARAMS = new URLSearchParams(VIDEO_URL.split("?")[1] ?? "");
+
+let youtubeApiPromise: Promise<YoutubeNamespace> | null = null;
+
+const loadYoutubeApi = () => {
+  if (typeof window === "undefined") {
+    return Promise.reject(new Error("YouTube API unavailable on the server"));
+  }
+
+  if (window.YT?.Player) {
+    return Promise.resolve(window.YT);
+  }
+
+  if (youtubeApiPromise) {
+    return youtubeApiPromise;
+  }
+
+  youtubeApiPromise = new Promise<YoutubeNamespace>((resolve, reject) => {
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      'script[src="https://www.youtube.com/iframe_api"]',
+    );
+    const previousReady = window.onYouTubeIframeAPIReady;
+
+    window.onYouTubeIframeAPIReady = () => {
+      previousReady?.();
+      if (window.YT) {
+        resolve(window.YT);
+      }
+    };
+
+    if (existingScript) return;
+
+    const script = document.createElement("script");
+    script.src = "https://www.youtube.com/iframe_api";
+    script.async = true;
+    script.onerror = () => {
+      youtubeApiPromise = null;
+      reject(new Error("Failed to load the YouTube IFrame API"));
+    };
+
+    document.body.appendChild(script);
+  });
+
+  return youtubeApiPromise;
 };
 
 const lockLandscapeOrientation = async () => {
@@ -50,7 +146,9 @@ const unlockScreenOrientation = () => {
 };
 
 const VideoContainerLanding = () => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const playerHostRef = useRef<HTMLDivElement | null>(null);
+  const playerRef = useRef<YoutubePlayer | null>(null);
+  const playerFrameRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useIsMobile();
 
   const [isPaused, setIsPaused] = useState(true);
@@ -69,6 +167,8 @@ const VideoContainerLanding = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const rafRef = useRef<number | null>(null);
   const isScrubbingRef = useRef(false);
+  const volumeRef = useRef(volume);
+  const isMutedRef = useRef(isMuted);
 
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const controlTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -78,15 +178,16 @@ const VideoContainerLanding = () => {
    * Play / Pause
    * ------------------------------------------------------ */
   const togglePlay = () => {
-    const v = videoRef.current;
-    if (!v) return;
+    const player = playerRef.current;
+    const yt = window.YT;
+    if (!player || !yt) return;
 
-    if (v.paused) {
-      v.play();
-      setIsPaused(false);
-    } else {
-      v.pause();
+    if (player.getPlayerState() === yt.PlayerState.PLAYING) {
+      player.pauseVideo();
       setIsPaused(true);
+    } else {
+      player.playVideo();
+      setIsPaused(false);
     }
   };
 
@@ -113,13 +214,23 @@ const VideoContainerLanding = () => {
     controlTimeout.current = setTimeout(() => setIsUsingVolume(false), 1000);
   };
 
-  // Apply volume to HTML5 video
+  // Apply volume to the current player
   useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
+    const player = playerRef.current;
+    if (!player) return;
 
-    v.volume = volume;
-    v.muted = isMuted;
+    player.setVolume(Math.round(volume * 100));
+
+    if (isMuted) {
+      player.mute();
+    } else {
+      player.unMute();
+    }
+  }, [volume, isMuted]);
+
+  useEffect(() => {
+    volumeRef.current = volume;
+    isMutedRef.current = isMuted;
   }, [volume, isMuted]);
 
   /* ------------------------------------------------------
@@ -135,8 +246,8 @@ const VideoContainerLanding = () => {
   };
 
   const onScrubEnd = () => {
-    const v = videoRef.current;
-    if (v) v.currentTime = currentTime;
+    const player = playerRef.current;
+    if (player) player.seekTo(currentTime, true);
 
     isScrubbingRef.current = false;
     if (!isPaused) startProgressLoop();
@@ -146,10 +257,12 @@ const VideoContainerLanding = () => {
    * Progress loop (requestAnimationFrame)
    * ------------------------------------------------------ */
   const startProgressLoop = () => {
+    stopProgressLoop();
+
     const tick = () => {
-      const v = videoRef.current;
-      if (v && !isScrubbingRef.current) {
-        setCurrentTime(v.currentTime);
+      const player = playerRef.current;
+      if (player && !isScrubbingRef.current) {
+        setCurrentTime(player.getCurrentTime());
       }
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -158,26 +271,27 @@ const VideoContainerLanding = () => {
 
   const stopProgressLoop = () => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
   };
 
   const enterNativeFullscreen = async () => {
-    const v = videoRef.current;
-    if (!v) return false;
+    const element = (playerFrameRef.current ??
+      wrapperRef.current) as WebkitHTMLElement | null;
+    if (!element) return false;
 
     try {
-      if (v.requestFullscreen) {
-        await v.requestFullscreen();
+      if (element.requestFullscreen) {
+        await element.requestFullscreen();
         setIsNativeFullscreen(true);
         await lockLandscapeOrientation();
         return true;
       }
     } catch {
-      // Continue with webkit fallback.
+      // Continue with the webkit fallback.
     }
 
-    const webkitVideo = v as WebkitVideoElement;
-    if (webkitVideo.webkitEnterFullscreen) {
-      webkitVideo.webkitEnterFullscreen();
+    if (element.webkitRequestFullscreen) {
+      await element.webkitRequestFullscreen();
       setIsNativeFullscreen(true);
       await lockLandscapeOrientation();
       return true;
@@ -188,18 +302,12 @@ const VideoContainerLanding = () => {
 
   const exitNativeFullscreen = async () => {
     const doc = document as WebkitDocument;
-    const webkitVideo = videoRef.current as WebkitVideoElement | null;
 
     try {
       if (document.fullscreenElement && document.exitFullscreen) {
         await document.exitFullscreen();
       } else if (doc.webkitFullscreenElement && doc.webkitExitFullscreen) {
         await doc.webkitExitFullscreen();
-      } else if (
-        webkitVideo?.webkitDisplayingFullscreen &&
-        webkitVideo.webkitExitFullscreen
-      ) {
-        webkitVideo.webkitExitFullscreen();
       }
     } finally {
       setIsNativeFullscreen(false);
@@ -233,31 +341,103 @@ const VideoContainerLanding = () => {
    * Attach video events
    * ------------------------------------------------------ */
   useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
+    let cancelled = false;
+    let mountedPlayer: YoutubePlayer | null = null;
 
-    const onLoaded = () => {
-      setDuration(v.duration);
+    const stopLoop = () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
     };
 
-    const onPlay = () => {
-      setIsPaused(false);
-      startProgressLoop();
+    const startLoop = () => {
+      stopLoop();
+
+      const tick = () => {
+        const player = playerRef.current;
+        if (player && !isScrubbingRef.current) {
+          setCurrentTime(player.getCurrentTime());
+        }
+        rafRef.current = requestAnimationFrame(tick);
+      };
+
+      rafRef.current = requestAnimationFrame(tick);
     };
 
-    const onPause = () => {
-      setIsPaused(true);
-      stopProgressLoop();
+    const initPlayer = async () => {
+      if (!playerHostRef.current || !YOUTUBE_VIDEO_ID) return;
+
+      const yt = await loadYoutubeApi();
+      if (cancelled || !playerHostRef.current) return;
+
+      mountedPlayer = new yt.Player(playerHostRef.current, {
+        videoId: YOUTUBE_VIDEO_ID,
+        width: "100%",
+        height: "100%",
+        playerVars: {
+          autoplay: Number(VIDEO_URL_PARAMS.get("autoplay") ?? "0"),
+          controls: Number(VIDEO_URL_PARAMS.get("controls") ?? "0"),
+          loop: Number(VIDEO_URL_PARAMS.get("loop") ?? "0"),
+          modestbranding: Number(VIDEO_URL_PARAMS.get("modestbranding") ?? "1"),
+          playlist: VIDEO_URL_PARAMS.get("playlist") ?? YOUTUBE_VIDEO_ID,
+          playsinline: 1,
+          rel: 0,
+        },
+        events: {
+          onReady: ({ target }) => {
+            if (cancelled) return;
+
+            playerRef.current = target;
+            setDuration(target.getDuration());
+            setCurrentTime(target.getCurrentTime());
+            target.setVolume(Math.round(volumeRef.current * 100));
+
+            if (isMutedRef.current) {
+              target.mute();
+            } else {
+              target.unMute();
+            }
+
+            if (VIDEO_URL_PARAMS.get("autoplay") === "1") {
+              target.playVideo();
+            }
+          },
+          onStateChange: ({ data, target }) => {
+            if (cancelled) return;
+
+            const nextDuration = target.getDuration();
+            if (nextDuration > 0) {
+              setDuration(nextDuration);
+            }
+
+            if (data === yt.PlayerState.PLAYING) {
+              setIsPaused(false);
+              startLoop();
+              return;
+            }
+
+            if (
+              data === yt.PlayerState.PAUSED ||
+              data === yt.PlayerState.ENDED ||
+              data === yt.PlayerState.CUED
+            ) {
+              setIsPaused(true);
+              stopLoop();
+            }
+          },
+        },
+      });
     };
 
-    v.addEventListener("loadedmetadata", onLoaded);
-    v.addEventListener("play", onPlay);
-    v.addEventListener("pause", onPause);
+    void initPlayer();
 
     return () => {
-      v.removeEventListener("loadedmetadata", onLoaded);
-      v.removeEventListener("play", onPlay);
-      v.removeEventListener("pause", onPause);
+      cancelled = true;
+      stopLoop();
+      mountedPlayer?.destroy();
+
+      if (playerRef.current === mountedPlayer) {
+        playerRef.current = null;
+      }
     };
   }, []);
 
@@ -280,9 +460,6 @@ const VideoContainerLanding = () => {
   }, [cinema]);
 
   useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-
     const doc = document as WebkitDocument;
 
     const onFullscreenChange = () => {
@@ -296,28 +473,10 @@ const VideoContainerLanding = () => {
       }
     };
 
-    const onWebkitBeginFullscreen = () => {
-      setIsNativeFullscreen(true);
-      void lockLandscapeOrientation();
-    };
-
-    const onWebkitEndFullscreen = () => {
-      setIsNativeFullscreen(false);
-      unlockScreenOrientation();
-    };
-
     document.addEventListener("fullscreenchange", onFullscreenChange);
     document.addEventListener(
       "webkitfullscreenchange",
       onFullscreenChange as EventListener,
-    );
-    v.addEventListener(
-      "webkitbeginfullscreen",
-      onWebkitBeginFullscreen as EventListener,
-    );
-    v.addEventListener(
-      "webkitendfullscreen",
-      onWebkitEndFullscreen as EventListener,
     );
 
     return () => {
@@ -325,14 +484,6 @@ const VideoContainerLanding = () => {
       document.removeEventListener(
         "webkitfullscreenchange",
         onFullscreenChange as EventListener,
-      );
-      v.removeEventListener(
-        "webkitbeginfullscreen",
-        onWebkitBeginFullscreen as EventListener,
-      );
-      v.removeEventListener(
-        "webkitendfullscreen",
-        onWebkitEndFullscreen as EventListener,
       );
       unlockScreenOrientation();
     };
@@ -382,15 +533,13 @@ const VideoContainerLanding = () => {
         </button>
 
         <div className="new-home-video">
-          {/* HTML5 VIDEO */}
-          <video
-            ref={videoRef}
-            src={VIDEO_URL}
-            className="youtube-player-container"
-            playsInline
-            autoPlay
-            muted
-          />
+          <div
+            ref={playerFrameRef}
+            className="new-home-video-player"
+            aria-label="Usearly video"
+          >
+            <div ref={playerHostRef} className="new-home-video-player-host" />
+          </div>
 
           {/* Overlay for clicking + double-click cinema */}
           <div

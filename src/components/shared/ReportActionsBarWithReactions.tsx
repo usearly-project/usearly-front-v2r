@@ -1,17 +1,21 @@
 import React, { useState } from "react";
-import { ThumbsUp, MessageCircle, Share2 } from "lucide-react";
+import { ThumbsUp, MessageCircle, Lightbulb } from "lucide-react";
 import { useReactionsForDescription } from "@src/hooks/useReactionsForDescription";
 import { getEmojisForType } from "@src/components/constants/emojiMapByType";
 import "./ReportActionsBar.scss";
 import EmojiUrlyReactionPicker from "@src/utils/EmojiUrlyReactionPicker";
-import StatutIcon from "@src/assets/statut-icon.svg?react";
 import { TICKET_STATUSES, type TicketStatusKey } from "@src/types/ticketStatus";
 import Avatar from "@src/components/shared/Avatar";
 import type { HasBrandResponse } from "@src/types/brandResponse";
 import { getBrandAvatarFromResponse } from "@src/utils/brandResponse";
+import ReportAvatars from "@src/pages/public/ReportsAvatar";
+import type { User } from "@src/types/Reports";
+import { useAuth } from "@src/services/AuthContext";
 
 interface Props {
-  userId: string;
+  type: "report" | "suggestion" | "coupDeCoeur";
+  userId?: string;
+  solutionsCount?: number;
   descriptionId: string;
   reportsCount: number;
   reportId?: string;
@@ -23,26 +27,46 @@ interface Props {
   onReactClick: () => void;
   onCommentClick: () => void;
   onToggleSimilarReports?: () => void;
+  descriptions?: {
+    author: {
+      id: string;
+      pseudo: string;
+      avatar: string | null;
+    } | null;
+  }[];
+  onOpenSolutionModal?: () => void;
+  onOpenSolutionsList?: () => void;
 }
 
 const ReportActionsBarWithReactions: React.FC<Props> = ({
-  userId,
   descriptionId,
   reportsCount,
   commentsCount,
   hasBrandResponse,
   status,
+  solutionsCount = 0,
   onCommentClick,
   onToggleSimilarReports,
+  descriptions,
+  onOpenSolutionModal,
 }) => {
+  const { userProfile } = useAuth();
+  const isAuthenticated = !!userProfile?.id;
   const { getCount, handleReact } = useReactionsForDescription(
-    userId,
+    userProfile?.id ?? "",
     descriptionId,
   );
   const emojis = getEmojisForType("report");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   let hoverTimeout: NodeJS.Timeout;
   const statusConfig = TICKET_STATUSES.find((s) => s.key === status);
+  const [showAuthTooltip, setShowAuthTooltip] = useState(false);
+  const [tooltipText, setTooltipText] = useState("");
+
+  console.log("PROPS", {
+    reportsCount,
+    descriptions,
+  });
 
   if (!statusConfig) {
     console.warn("❌ Status inconnu reçu:", status);
@@ -59,9 +83,25 @@ const ReportActionsBarWithReactions: React.FC<Props> = ({
   const brandAvatar = getBrandAvatarFromResponse(hasBrandResponse);
 
   const handleAddReaction = async (emoji: string) => {
+    if (!isAuthenticated) {
+      triggerTooltip("Connecte-toi pour réagir");
+      return;
+    }
+
     await handleReact(emoji);
     setShowEmojiPicker(false);
   };
+  const triggerTooltip = (text: string) => {
+    setTooltipText(text);
+    setShowAuthTooltip(true);
+
+    setTimeout(() => {
+      setShowAuthTooltip(false);
+    }, 2000);
+  };
+  const reporters = (descriptions ?? [])
+    .map((d) => d.author)
+    .filter((u): u is User => !!u);
 
   return (
     <div className="report-actions-bar">
@@ -130,18 +170,21 @@ const ReportActionsBarWithReactions: React.FC<Props> = ({
             </>
           )}
 
-          {reportsCount > 1 && (
-            <>
-              <span className="dot-separator">·</span>
+          <div className="signalements-avatars">
+            {reporters.length > 0 && <ReportAvatars users={reporters} />}
+
+            {reportsCount > 0 && (
               <span
                 className="resignalements-link"
                 onClick={onToggleSimilarReports}
               >
-                {reportsCount}{" "}
-                {reportsCount === 1 ? "signalement" : "signalements"}
+                <span className="resignalements-count">{reportsCount}</span>
+                <span className="resignalements-label">
+                  {reportsCount === 1 ? " signalement" : " signalements"}
+                </span>
               </span>
-            </>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
@@ -152,6 +195,11 @@ const ReportActionsBarWithReactions: React.FC<Props> = ({
           <div
             className="react-hover-area"
             onMouseEnter={() => {
+              if (!isAuthenticated) {
+                triggerTooltip("Connecte-toi pour réagir");
+                return;
+              }
+
               if (hoverTimeout) clearTimeout(hoverTimeout);
               setShowEmojiPicker(true);
             }}
@@ -162,42 +210,71 @@ const ReportActionsBarWithReactions: React.FC<Props> = ({
             }}
             style={{ position: "relative" }}
           >
-            <button type="button">
+            <button
+              type="button"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  triggerTooltip("Connecte-toi pour réagir");
+                  return;
+                }
+              }}
+            >
               <ThumbsUp size={18} />
               <span className="reagir-span-btn">Réagir</span>
             </button>
-            {showEmojiPicker && (
+
+            {showEmojiPicker && isAuthenticated && (
               <div className="emoji-picker-container">
                 <EmojiUrlyReactionPicker
                   onSelect={handleAddReaction}
                   type="report"
-                  userId={userId}
+                  userId={userProfile?.id ?? ""}
                   descriptionId={descriptionId}
                 />
               </div>
             )}
           </div>
 
-          <button onClick={onCommentClick}>
+          <button
+            onClick={() => {
+              if (!userProfile?.id) {
+                triggerTooltip("Connecte-toi pour commenter");
+                return;
+              }
+
+              onCommentClick();
+            }}
+          >
             <MessageCircle size={18} />
             <span className="commenter-span-btn">Commenter</span>
           </button>
-          <button>
-            <Share2 size={18} />
-            <span className="partager-span-btn">Partager</span>
+        </div>
+
+        <div className="actions-right">
+          <button
+            className={`solution-btn ${
+              solutionsCount > 0 ? "solution-btn-active" : "solution-btn-empty"
+            }`}
+            onClick={() => {
+              if (!userProfile?.id) {
+                triggerTooltip("Connecte-toi pour proposer une solution");
+                return;
+              }
+              console.log("SOLUTION...: ", solutionsCount);
+              onOpenSolutionModal?.();
+            }}
+          >
+            <Lightbulb size={18} />
+
+            <span>
+              {solutionsCount > 0
+                ? `Solution (${solutionsCount})`
+                : "Proposer une solution"}
+            </span>
           </button>
         </div>
-        <div
-          className={`status-badge status-${status}`}
-          style={{
-            color: statusConfig.color,
-            backgroundColor: statusConfig.bg,
-          }}
-        >
-          <StatutIcon className={`status-icon status-icon-${status}`} />
-          <span>{statusConfig.label}</span>
-        </div>
       </div>
+      {showAuthTooltip && <div className="auth-tooltip">{tooltipText}</div>}
     </div>
   );
 };

@@ -65,6 +65,7 @@ export interface ConfirmedSubcategoryReport {
   siteUrl: string | null;
   marque: string;
   category: string;
+  solutionsCount?: number;
   hasBrandResponse: HasBrandResponse;
   capture: string | null;
   createdAt: string;
@@ -213,10 +214,11 @@ export interface SimplifiedFeedbackDescription {
 }
 
 export interface GroupedReport {
-  id: string;
+  id?: string;
   reportingId: string;
   category: string;
   marque: string;
+  solutionsCount?: number;
   hasBrandResponse?: HasBrandResponse;
   siteUrl?: string | null;
   capture?: string | null;
@@ -261,6 +263,7 @@ export interface ExplodedGroupedReport extends GroupedReport {
     descriptions: FeedbackDescription[];
   };
   date?: string;
+  solutionsCount?: number;
 }
 export interface PopularGroupedReport {
   reportingId: string;
@@ -268,18 +271,52 @@ export interface PopularGroupedReport {
   siteUrl?: string | null;
   status: TicketStatusKey;
   category: string;
+  solutionsCount?: number;
   subCategory: string;
   count: number;
   createdAt: string;
   descriptions: FeedbackDescription[];
 }
 
+export type PublicReport = {
+  reportingId: string;
+  emoji: string;
+  descriptionId: string;
+  marque: string;
+  siteUrl: string;
+  subCategory: string;
+  description: string;
+  capture: string | null;
+  latestActivityAt: string;
+  solutionsCount?: number;
+  author: {
+    id: string;
+    pseudo: string;
+    avatar: string | null;
+  };
+
+  reportsCount: number;
+  confirmationsCount: number;
+
+  reporters: {
+    id: string;
+    pseudo: string;
+    avatar: string | null;
+    description: string;
+    emoji: string;
+    createdAt?: string;
+  }[];
+
+  hasBrandResponse: boolean;
+  createdAt: string;
+};
 export interface PopularReport {
   id: string; // id de la description
   reportingId: string;
   subCategory: string;
   description: string;
   siteUrl: string | null;
+  solutionsCount?: number;
   marque: string;
   status: TicketStatusKey;
   category: string;
@@ -322,6 +359,7 @@ export interface UserGroupedReport {
   reportingId: string;
   siteUrl: string;
   marque: string;
+  solutionsCount?: number;
   hasBrandResponse: HasBrandResponse;
   reportIds: string[];
   status: TicketStatusKey;
@@ -396,6 +434,7 @@ export interface PublicGroupedReportFromAPI {
   marque: string;
   category: string;
   status: TicketStatusKey;
+  solutionsCount?: number;
   hasBrandResponse?: HasBrandResponse;
   subCategory: string;
   siteUrl?: string | null;

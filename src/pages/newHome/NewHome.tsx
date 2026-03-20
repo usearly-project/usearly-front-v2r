@@ -1,4 +1,4 @@
-/* import React, { useCallback } from "react";
+import React, { useCallback } from "react";
 import "./NewHome.scss";
 import BrandCard from "./card/BrandCard";
 import Footer from "@src/components/layout/Footer";
@@ -7,7 +7,7 @@ import ExtensionExample from "./components/extensionExample/ExtensionExample";
 import UsearlyDrawing from "@src/components/background/Usearly";
 import HeroSection from "./components/heroSection/HeroSection";
 import ScrollInlineImages from "./components/scroll-text/ScrollInlineImages";
-import FavoriteSection from "./components/slide-stack/FavoriteSection";
+// import FavoriteSection from "./components/slide-stack/FavoriteSection";
 import InfiniteCarouselBanner from "./components/infiniteCarouselBanner/InfiniteCarouselBanner";
 import { useIsAtBottom } from "@src/hooks/detect-bottom";
 
@@ -54,9 +54,9 @@ const NewHome: React.FC = () => {
           />
         </div>
       </div>
-      <div className="favorite-isolated">
+      {/* <div className="favorite-isolated">
         <FavoriteSection />
-      </div>
+      </div> */}
 
       <div className="new-home-main">
         <BrandCard />
@@ -82,4 +82,3 @@ const NewHome: React.FC = () => {
 };
 
 export default NewHome;
- */

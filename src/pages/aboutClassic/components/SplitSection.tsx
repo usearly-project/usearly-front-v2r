@@ -1,6 +1,5 @@
-import { useRef, type ReactNode, type RefObject } from "react";
-import MouseTrail from "../../newHome/components/heroSection/MouseTrail";
-import usePlanetScene from "../hooks/usePlanetScene";
+import { type ReactNode, type RefObject } from "react";
+// import PlanetCanvas from "@src/components/canvas/PlanetCanvas";
 
 type SplitSectionProps = {
   sectionRef: RefObject<HTMLDivElement | null>;
@@ -49,20 +48,15 @@ const CARDS: CardContent[] = [
   },
 ];
 
-const ABOUT_TRAIL_IMAGES = Array.from(
-  { length: 13 },
-  (_, index) => `/assets/images/about/imageAbout${index + 1}.png`,
-);
-
 const SplitSection = ({ sectionRef }: SplitSectionProps) => (
   <div
     className="about-classic__section about-classic__section--split"
     ref={sectionRef}
   >
     <Cards />
-    <div className="about-classic__statement">
+    {/* <div className="about-classic__statement">
       <PlanetCanvas />
-    </div>
+    </div> */}
   </div>
 );
 
@@ -78,18 +72,5 @@ const Cards = () => (
     ))}
   </div>
 );
-
-const PlanetCanvas = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  usePlanetScene(canvasRef as RefObject<HTMLCanvasElement>);
-
-  return (
-    <div className="about-classic__canvas-wrap">
-      <canvas id="c" ref={canvasRef} aria-label="Planète 3D"></canvas>
-      <MouseTrail images={ABOUT_TRAIL_IMAGES} mode="random" />
-    </div>
-  );
-};
 
 export default SplitSection;

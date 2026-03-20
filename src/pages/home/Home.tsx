@@ -1,16 +1,16 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import "./Home.scss";
 import { type FeedbackType } from "@src/components/user-profile/FeedbackTabs";
-import UserStatsCard from "@src/components/user-profile/UserStatsCard";
 import PurpleBanner from "./components/purpleBanner/PurpleBanner";
 import { useFeedbackData } from "./hooks/useFeedbackData";
 import { useBrandColors } from "./hooks/useBrandColors";
 import { useCategories } from "./hooks/useCategories";
 import { useIsAtBottom } from "@src/hooks/detect-bottom";
-
 import ReportTab from "./home-tabs/ReportTab";
 import CdcTabEnhanced from "./home-tabs/CdcTabEnhanced";
 import SuggestionTabEnhanced from "./home-tabs/SuggestionTabEnhanced";
+import LeftSidebar from "../public/sidebars/LeftSidebar";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const FEEDBACK_LIST_WRAPPER_SELECTOR = ".feedback-list-wrapper";
 const BOTTOM_THRESHOLD_PX = 12;
@@ -60,6 +60,15 @@ function Home() {
   const [activeFilter, setActiveFilter] = useState("chrono");
   const [suggestionSearch, setSuggestionSearch] = useState("");
   const [selectedSiteUrl, setSelectedSiteUrl] = useState<string | undefined>();
+  const [searchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab") as FeedbackType | null;
+  const navigate = useNavigate();
+  const validTabs: FeedbackType[] = ["report", "coupdecoeur", "suggestion"];
+  const safeTab: FeedbackType =
+    tabFromUrl && validTabs.includes(tabFromUrl as FeedbackType)
+      ? (tabFromUrl as FeedbackType)
+      : "report";
+
   const isAtBottom = useIsAtBottom({
     thresholdPx: BOTTOM_THRESHOLD_PX,
     anchorSelector: FEEDBACK_LIST_WRAPPER_SELECTOR,
@@ -75,6 +84,39 @@ function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+
+    const hasOnlyValidParam =
+      searchParams.has("tab") && validTabs.includes(tab as FeedbackType);
+
+    if (!hasOnlyValidParam) {
+      navigate("/feedback?tab=report", { replace: true });
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (safeTab !== activeTab) {
+      const defaults = getDefaultFilters();
+
+      setSelectedBrand(defaults.selectedBrand);
+      setSelectedCategory(defaults.selectedCategory);
+      setSelectedMainCategory(defaults.selectedMainCategory);
+      setSuggestionSearch(defaults.suggestionSearch);
+      setSelectedSiteUrl(defaults.selectedSiteUrl);
+
+      // ✅ important
+      if (safeTab === "report") {
+        setActiveFilter("chrono");
+      } else if (safeTab === "coupdecoeur") {
+        setActiveFilter("chrono");
+      } else if (safeTab === "suggestion") {
+        setActiveFilter("allSuggest");
+      }
+
+      setActiveTab(safeTab);
+    }
+  }, [safeTab]);
   const handleTabChange = useCallback(
     (nextTab: FeedbackType) => {
       if (nextTab === activeTab) return;
@@ -164,14 +206,14 @@ function Home() {
     coupDeCoeursForDisplay,
     suggestionsForDisplay,
   ]);
-
+  console.log("ACTIVE TAB:", activeTab);
   return (
     <div className="home-page">
       <PurpleBanner activeTab={activeTab} onTabChange={handleTabChange} />
 
       <main className="user-main-content">
         <aside className="left-panel">
-          <UserStatsCard />
+          <LeftSidebar />
         </aside>
 
         {activeTab === "report" && (

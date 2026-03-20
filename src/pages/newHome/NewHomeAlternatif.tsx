@@ -1,24 +1,25 @@
 import React, { useCallback, useRef } from "react";
 import "./NewHomeAlternatif.scss";
-import Footer from "@src/components/layout/Footer";
-import TitleSection from "@src/pages/aboutClassic/components/TitleSection";
+import UsearlyFooter from "@src/components/layout/UsearlyFooter";
+// import TitleSection from "@src/pages/aboutClassic/components/TitleSection";
 import ExtensionExample from "./components/extensionExample/ExtensionExample";
-import UsearlyDrawing from "@src/components/background/Usearly";
-import Hero from "@src/pages/aboutClassic/components/Hero";
+// import Hero from "@src/pages/aboutClassic/components/Hero";
+import SectionHookUsers from "./components/sectionHookUsers/SectionHookUsers";
 import ScrollInlineImages from "./components/scroll-text/ScrollInlineImages";
 import InfiniteCarouselBanner from "./components/infiniteCarouselBanner/InfiniteCarouselBanner";
-import useScrollPhrase from "@src/pages/aboutClassic/hooks/useScrollPhrase";
+// import useScrollPhrase from "@src/pages/aboutClassic/hooks/useScrollPhrase";
 import ExtensionRedirect from "@src/components/extension-redirect/ExtensionRedirect";
 import { useIsAtBottom } from "@src/hooks/detect-bottom";
 import FavoriteCarouselSection from "./components/slide-stack/FavoriteCarouselSection";
+import SectionJoinUsearly from "@src/pages/newHome/components/sectionJoinUsearly/SectionJoinUsearly";
 
-const PHRASES = ["des sondages", "des chatbots", "le silence"];
-const SCROLL_STEP = 0.05;
+// const PHRASES = ["des sondages", "des chatbots", "le silence"];
+// const SCROLL_STEP = 0.05;
 const BOTTOM_THRESHOLD_PX = 12;
 
 const NewHome: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null!);
-  const phraseIndex = useScrollPhrase(sectionRef, PHRASES.length, SCROLL_STEP);
+  // const phraseIndex = useScrollPhrase(sectionRef, PHRASES.length, SCROLL_STEP);
   const isAtBottom = useIsAtBottom(BOTTOM_THRESHOLD_PX);
   const scrollToTop = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -28,8 +29,11 @@ const NewHome: React.FC = () => {
 
   return (
     <div className="new-home-page">
-      <Hero page={"landing"} />
-      <TitleSection phrase={PHRASES[phraseIndex]} />
+      {/* <Hero page={"landing"} />
+       */}
+      <SectionHookUsers />
+      <SectionJoinUsearly />
+      {/* <TitleSection phrase={PHRASES[phraseIndex]} /> */}
 
       {/* --- SECTION NORMALE --- */}
       <div className="new-home-main" ref={sectionRef}>
@@ -49,7 +53,7 @@ const NewHome: React.FC = () => {
             ]}
             images={[
               { line: 1, wordIndex: 1, src: "/assets/images/txt1.png" },
-              { line: 3, wordIndex: 2, src: "/assets/images/txt2.png" },
+              { line: 3, wordIndex: 2, src: "/assets/images/txt2.svg" },
               {
                 line: 2,
                 wordIndex: 2,
@@ -65,10 +69,7 @@ const NewHome: React.FC = () => {
       <div className="new-home-main">
         <FavoriteCarouselSection />
         {/* <BrandCard /> */}
-        <div className="usearly-drawing-container">
-          <UsearlyDrawing animationDuration="25" />
-          <Footer />
-        </div>
+        <UsearlyFooter />
       </div>
 
       {isAtBottom && (

@@ -139,26 +139,32 @@ export function useFeedbackData(
    * 🧭 Gestion du reset intelligent
    */
   useEffect(() => {
-    const isFirstLoad = prevTab.current === null;
-    const tabChanged = isFirstLoad || prevTab.current !== activeTab;
+    const tabChanged = prevTab.current !== activeTab;
     const filterChanged =
-      isFirstLoad ||
       prevFilter.current !== activeFilter ||
       prevBrand.current !== selectedBrand;
 
     if (tabChanged) {
       console.log("🧹 Reset total (changement d'onglet)");
-      setFeedbackData([]); // 👈 vide immédiat
+
+      isFetchingRef.current = false; // 🔥 IMPORTANT
+
+      setFeedbackData([]);
       setPage(1);
       setHasMore(true);
       setIsInitialLoading(true);
+
       fetchPage(1, true);
     } else if (filterChanged) {
       console.log("♻️ Rafraîchissement (filtre ou marque)");
-      setFeedbackData([]); // 👈 vide immédiat pour éviter affichage doublé
+
+      isFetchingRef.current = false; // 🔥 IMPORTANT
+
+      setFeedbackData([]);
       setPage(1);
-      setHasMore(true); // 👈 réinitialise la pagination
-      setIsInitialLoading(false); // 👈 garde un spinner léger (pas celui du tout début)
+      setHasMore(true);
+      setIsInitialLoading(false);
+
       fetchPage(1, true);
     }
 

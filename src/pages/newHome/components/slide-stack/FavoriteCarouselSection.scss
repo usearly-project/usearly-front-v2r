@@ -4,43 +4,86 @@
   width: 100%;
   margin: 0 auto;
   background: #a8b9cc;
-  padding: 80px 60px;
+  padding: 65px 60px 80px 60px;
+  padding-bottom: 100px;
+  padding-right: 0px;
   border-radius: 36px;
   margin-bottom: 50px;
+  transition: background-color 0.35s ease;
+  @media screen and (max-width: 1050px) {
+    padding-top: 10px;
+    padding-bottom: 75px;
+  }
+}
+
+.favorite-section--reports {
+  background: #cae1ff;
+}
+
+.favorite-section--favorites {
+  background: #d0caff;
+}
+
+.favorite-section--suggestions {
+  background: #def4c3;
 }
 
 .favorite-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 80px;
+  gap: 20px;
 }
 
 .favorite-left {
   max-width: 420px;
+  height: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
 }
 
 .favorite-title {
-  font-size: 48px;
+  font-size: 52px;
   font-weight: 900;
   line-height: 1.1;
   font-family: $font-main-text;
+  @media screen and (max-width: 1250px) {
+    font-size: 40px;
+  }
 }
 
 .favorite-button {
+  width: fit-content;
   margin-top: 30px;
   background: black;
   color: white;
   border-radius: 40px;
-  padding: 14px 28px;
+  padding: 16px 34px;
   border: none;
+  font-size: 22px;
   cursor: pointer;
+  @media screen {
+  }
 }
 
 .favorite-right {
   flex: 1;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+
+  .desktop-carousel {
+    position: static;
+  }
+
+  .stacked-card img,
+  .mobile-carousel__card img,
+  .carousel-arrow,
+  .mobile-carousel__nav {
+    box-shadow: none;
+  }
 }
 
 .favorite-title {
@@ -67,15 +110,19 @@
     transform: translateY(0);
   }
 }
+
+@media screen and (max-width: 1060px) {
+  .favorite-title {
+    font-size: 36px;
+  }
+}
+
 @media (max-width: 900px) {
   .favorite-section {
     margin-top: 50px;
-    padding: 50px 24px;
+    padding: 50px 12px;
   }
 
-  .favorite-wrapper {
-    gap: 28px;
-  }
   .favorite-wrapper {
     flex-direction: column;
     gap: 40px;
@@ -84,6 +131,7 @@
   .favorite-left {
     max-width: 100%;
     text-align: center;
+    width: 100%;
   }
 
   .favorite-right {

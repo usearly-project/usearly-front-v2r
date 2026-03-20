@@ -83,24 +83,16 @@ const FlatReportList = ({
               className={`report-group-header ${isOpen ? "open" : ""}`}
               onClick={() => handleToggle(brand)}
             >
-              {isOpen ? (
-                <div className="report-main-info">
-                  <img className="brand-logo-small" src={logoUrl} alt={brand} />
-                  <span className="report-count">{total}</span>
-                  <span className="report-label">
-                    signalement{total > 1 ? "s" : ""} sur{" "}
-                    <strong>{brand}</strong>
-                  </span>
-                </div>
-              ) : (
-                <div className="report-main-info">
-                  <span className="report-count">{total}</span>
-                  <span className="report-label">
-                    signalement{total > 1 ? "s" : ""} sur{" "}
-                    <strong>{brand}</strong>
-                  </span>
-                </div>
-              )}
+              <div className="report-main-info">
+                <img className="brand-logo-small" src={logoUrl} alt={brand} />
+                <span className="report-count-number">{total}</span>
+                <span className="report-label">
+                  signalement{total > 1 ? "s" : ""} sur <strong>{brand}</strong>
+                </span>
+                {latestDate && (
+                  <span className="report-date">• {latestDate}</span>
+                )}
+              </div>
               {isOpen ? (
                 <div className="svg-info">
                   <ChevronDown size={20} className="report-extra-info" />

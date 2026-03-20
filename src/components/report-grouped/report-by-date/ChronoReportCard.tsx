@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
 import { getCategoryIconPathFromSubcategory } from "@src/utils/IconsUtils";
 import { useAuth } from "@src/services/AuthContext";
 import DescriptionCommentSection from "@src/components/report-desc-comment/DescriptionCommentSection";
@@ -11,6 +10,8 @@ import { useIsMobile } from "@src/hooks/use-mobile";
 import type { ExplodedGroupedReport } from "@src/types/Reports";
 import FeedbackReportMobile from "./FeedbackReportMobile";
 import "./ChronoReportCard.scss";
+import SolutionModal from "@src/components/ui/SolutionModal";
+import SolutionsModal from "@src/components/ui/SolutionsModal";
 
 interface Props {
   item: ExplodedGroupedReport & { brandLogoUrl?: string };
@@ -30,6 +31,11 @@ const ChronoReportCard: React.FC<Props> = ({ item, isOpen, onToggle }) => {
   const previewLength = isMobile ? 90 : DESCRIPTION_PREVIEW_LENGTH;
   const firstDescription = item.subCategory.descriptions?.[0];
   const descriptionId = firstDescription?.id ?? "";
+  const [showSolutionModal, setShowSolutionModal] = useState(false);
+  const [showSolutionsList, setShowSolutionsList] = useState(false);
+  const [solutionsCount, setSolutionsCount] = useState(
+    item.solutionsCount ?? 0,
+  );
   const [localCommentsCounts, setLocalCommentsCounts] = useState<
     Record<string, number>
   >({});
@@ -189,8 +195,6 @@ const ChronoReportCard: React.FC<Props> = ({ item, isOpen, onToggle }) => {
                   type="report"
                 />
               </div>
-
-              <ChevronUp size={16} />
             </div>
           ) : (
             <div className="collapsed-header">
@@ -202,8 +206,6 @@ const ChronoReportCard: React.FC<Props> = ({ item, isOpen, onToggle }) => {
                 type="brand"
                 className="brand-logo"
               />
-
-              <ChevronDown size={16} />
             </div>
           )}
         </div>
@@ -252,15 +254,24 @@ const ChronoReportCard: React.FC<Props> = ({ item, isOpen, onToggle }) => {
           {/* ACTIONS */}
           <div onClick={(e) => e.stopPropagation()}>
             <ReportActionsBarWithReactions
+              type="report"
               userId={userProfile?.id || ""}
               descriptionId={descriptionId}
               hasBrandResponse={item.hasBrandResponse}
               reportsCount={item.subCategory.count}
               commentsCount={currentCount}
+              solutionsCount={solutionsCount}
               status={item.subCategory.status}
               onReactClick={() => {}}
               onCommentClick={handleCommentClick}
               onToggleSimilarReports={() => {}}
+              onOpenSolutionModal={() => {
+                if (solutionsCount > 0) {
+                  setShowSolutionsList(true);
+                } else {
+                  setShowSolutionModal(true);
+                }
+              }}
             />
           </div>
 
@@ -303,6 +314,27 @@ const ChronoReportCard: React.FC<Props> = ({ item, isOpen, onToggle }) => {
             />
           </div>
         </div>
+      )}
+      {showSolutionModal && (
+        <SolutionModal
+          reportId={item.reportingId}
+          onClose={() => setShowSolutionModal(false)}
+          onSuccess={() => {
+            setSolutionsCount((prev) => prev + 1); // ✅ update UI
+            setShowSolutionModal(false); // ✅ ferme modal
+            setShowSolutionsList(true); // ✅ ouvre liste
+          }}
+        />
+      )}
+      {showSolutionsList && (
+        <SolutionsModal
+          reportId={item.reportingId}
+          onClose={() => setShowSolutionsList(false)}
+          onAddSolution={() => {
+            setShowSolutionsList(false);
+            setShowSolutionModal(true);
+          }}
+        />
       )}
     </div>
   );

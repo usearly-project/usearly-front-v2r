@@ -86,7 +86,7 @@ export function useGroupedReportsLogic(
   // HOOKS BRUTS
   // ===============================
   const confirmedData = useConfirmedFlatData();
-  const rageData = usePaginatedGroupedReportsByRage(filter === "rage", 5);
+  const rageData = usePaginatedGroupedReportsByRage(filter === "rage", 10);
   const hotData = usePaginatedGroupedReportsByHot(filter === "hot", 10);
   const popularEngagementData = usePaginatedGroupedReportsByPopularEngagement(
     filter === "popular",
@@ -175,12 +175,6 @@ export function useGroupedReportsLogic(
     if (onSectionChange) onSectionChange(derivedSection);
   }, [derivedSection, onSectionChange]);
 
-  /*   useEffect(() => {
-    if (initializing) {
-      setFilter("chrono");
-      setInitializing(false);
-    }
-  }, [initializing]); */
   useEffect(() => {
     if (!initializing) return;
 

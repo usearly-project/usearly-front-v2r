@@ -1,7 +1,7 @@
 import { useEffect, type RefObject } from "react";
 import * as THREE from "three";
 
-const usePlanetScene = (canvasRef: RefObject<HTMLCanvasElement>) => {
+const usePlanetScene = (canvasRef: RefObject<HTMLCanvasElement | null>) => {
   useEffect(() => {
     let frameId = 0;
     let renderer: THREE.WebGLRenderer | null = null;

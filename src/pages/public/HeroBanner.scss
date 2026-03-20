@@ -1,0 +1,61 @@
+.hero-banner {
+  background: #10163a;
+  padding: 40px 0; // ❗ enlever le padding horizontal ici
+  color: white;
+
+  .hero-content {
+    max-width: 1200px; // 🔥 clé
+    margin: 0 auto; // 🔥 centre le contenu
+    padding: 0 40px; // espace interne propre
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hero-left h1 {
+    font-size: 34px;
+    font-weight: 700;
+  }
+
+  .highlight {
+    background: #5c8cff;
+    padding: 4px 10px;
+    border-radius: 8px;
+  }
+
+  .hero-right {
+    text-align: right;
+  }
+
+  .hero-stats {
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+    gap: 30px;
+  }
+
+  .hero-impact {
+    font-size: 14px;
+    opacity: 0.7;
+    margin-bottom: 6px;
+  }
+
+  .stat {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+
+    .stat-value {
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    img {
+      width: 2.8em; // 🔥 proportionnel au texte
+      height: 2.8em;
+      transform: translateY(0.08em);
+    }
+  }
+}

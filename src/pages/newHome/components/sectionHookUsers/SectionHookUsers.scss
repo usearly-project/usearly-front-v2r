@@ -1,0 +1,58 @@
+@use "@src/styles/base/variables" as *;
+
+.section-hook-users {
+  padding: 0 5rem;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  height: 100vh;
+  .hook-users-content {
+    margin-top: -10px;
+    .hook-users-content-text {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      .hook-users-title {
+        color: #000;
+        font-family: $font-family-4;
+        font-size: 50px;
+        font-style: normal;
+        font-weight: 800;
+        line-height: 131%; /* 65.5px */
+      }
+      .hook-users-subtitle {
+        width: 90%;
+        color: #000;
+        font-family: $font-family-3;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 151%; /* 36.24px */
+        letter-spacing: 0.24px;
+      }
+    }
+    .hook-users-content-buttons {
+      display: flex;
+      margin-top: 30px;
+      gap: 24px;
+      .hook-users-extension-button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 4px 17.9px 0 rgba(0, 0, 0, 0.25);
+        color: #2361d4;
+        font-family: $font-family;
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 158.293%; /* 31.659px */
+      }
+      .button-rejoindre {
+        font-weight: 900;
+      }
+    }
+  }
+}

@@ -8,7 +8,7 @@ import UserBrandLine from "../shared/UserBrandLine";
 
 interface Props {
   item: any;
-  onToggle: (id: string) => void;
+  onToggle?: (id: string) => void;
   userProfile: any;
   selectedImage: string | null;
   setSelectedImage: (value: string | null) => void;
@@ -34,7 +34,7 @@ const isValidDate = (value: any) => {
 
 const FeedbackRight: React.FC<Props> = ({
   item,
-  onToggle,
+  /* onToggle, */
   userProfile,
   /* selectedImage, */
   setSelectedImage,
@@ -160,7 +160,7 @@ const FeedbackRight: React.FC<Props> = ({
     <div
       ref={cardRef}
       className={`feedback-right${showFullText ? " is-expanded" : ""}`}
-      onClick={() => onToggle(item.id)}
+      //onClick={() => onToggle(item.id)}
     >
       <div className="feedback-content">
         <div className="feedback-header">

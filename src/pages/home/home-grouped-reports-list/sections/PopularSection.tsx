@@ -140,16 +140,6 @@ const PopularSection: React.FC<PopularSectionProps> = ({
   // ✅ Contenu principal
   return (
     <>
-      {/* 🔹 Liste principale des signalements */}
-      {/*      <PopularReportList
-        data={filteredPrimaryData}
-        expandedItems={expandedItems}
-        handleToggle={(key: string) =>
-          setExpandedItems((prev) => ({ ...prev, [key]: !prev[key] }))
-        }
-        loading={reportData.loading}
-      /> */}
-
       {/* 🔹 Résumé de la marque sélectionnée */}
       {selectedBrand && (
         <div className="selected-brand-summary">
@@ -191,9 +181,9 @@ const PopularSection: React.FC<PopularSectionProps> = ({
       <PopularReportList
         data={filteredEngagementData}
         expandedItems={expandedItems}
-        handleToggle={(key: string) =>
+        /* handleToggle={(key: string) =>
           setExpandedItems((prev) => ({ ...prev, [key]: !prev[key] }))
-        }
+        } */
         loading={popularEngagementData.loading}
       />
     </>

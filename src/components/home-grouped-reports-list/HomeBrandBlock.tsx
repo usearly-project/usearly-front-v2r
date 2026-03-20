@@ -333,6 +333,7 @@ const HomeBrandBlock: React.FC<Props> = ({ brand, siteUrl, reports }) => {
                       reportsCount={sub.count}
                       hasBrandResponse={hasBrandResponse}
                       brandLogoUrl={getBrandLogo(brand, siteUrl)}
+                      type="report"
                       commentsCount={
                         localCommentsCounts[initialDescription.id] ?? 0
                       }

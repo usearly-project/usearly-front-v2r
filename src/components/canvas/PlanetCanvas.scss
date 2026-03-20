@@ -1,0 +1,276 @@
+@use "@src/styles/base/variables" as *;
+
+/* Overlay */
+.planet-pop-feed {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.planet-pop-feed__item {
+  --planet-pop-feed-item-delay: 0ms;
+  --planet-pop-feed-surface: rgba(255, 255, 255, 1);
+  --planet-pop-feed-border: rgba(0, 0, 0, 0.08);
+  --planet-pop-feed-shadow: rgba(0, 0, 0, 0.05);
+  --planet-pop-feed-text: #fff;
+  --planet-pop-feed-rotation: 0deg;
+  --planet-pop-feed-item-radius: 999px;
+  --planet-pop-feed-bubble-radius: 999px;
+  --planet-pop-feed-photo-radius: 999px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: clamp(68px, 6.6vw, 112px);
+  border-radius: 30px;
+}
+
+.planet-pop-feed__item--pastel {
+  --planet-pop-feed-item-radius: 28px;
+  --planet-pop-feed-bubble-radius: 15px;
+  --planet-pop-feed-photo-radius: 26px;
+}
+
+/* Bubble stack */
+.planet-pop-feed__bubbles {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - -10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: max-content;
+  max-width: min(260px, calc(100vw - 32px));
+  transform: translateX(-50%);
+}
+
+.planet-pop-feed__item--align-start .planet-pop-feed__bubbles {
+  transform: translateX(-28%);
+  align-items: flex-start;
+}
+
+.planet-pop-feed__item--align-end .planet-pop-feed__bubbles {
+  transform: translateX(-70%);
+  align-items: flex-end;
+}
+
+.planet-pop-feed__bubble {
+  --planet-pop-feed-delay: 0ms;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  max-width: min(340px, calc(100vw - 32px));
+  padding: 12px 10px 12px 35px;
+  border: 3px solid var(--planet-pop-feed-border);
+  border-radius: var(--planet-pop-feed-bubble-radius);
+  background: var(--planet-pop-feed-surface);
+  box-shadow:
+    0 0px 10px 1px var(--planet-pop-feed-shadow),
+    0 0px 20px rgba(10, 18, 32, 0.08);
+  color: var(--planet-pop-feed-text);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transform: translateY(16px) scale(0.92);
+  animation: planet-pop-feed-bubble-life 4.5s ease both;
+  animation-delay: calc(
+    var(--planet-pop-feed-item-delay) + var(--planet-pop-feed-delay)
+  );
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -9px;
+    width: 14px;
+    height: 14px;
+    border-right: 3px solid var(--planet-pop-feed-border);
+    border-bottom: 3px solid var(--planet-pop-feed-border);
+    background: var(--planet-pop-feed-surface);
+    transform: translateX(-50%) rotate(45deg);
+  }
+}
+
+.planet-pop-feed__item--align-start .planet-pop-feed__bubble::after {
+  left: 30%;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.planet-pop-feed__item--align-end .planet-pop-feed__bubble::after {
+  left: 70%;
+  right: auto;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.planet-pop-feed__bubble-icon {
+  position: absolute;
+  top: -18px;
+  left: -8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+
+  img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    filter: drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
+      drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff)
+      drop-shadow(1px 1px 0 #fff) drop-shadow(-1px -1px 0 #fff)
+      drop-shadow(1px -1px 0 #fff) drop-shadow(-1px 1px 0 #fff);
+  }
+}
+
+.planet-pop-feed__bubble-text {
+  display: block;
+  flex: 1 1 auto;
+  max-width: 300px;
+  overflow-wrap: anywhere;
+  font-family: $font-family;
+  font-size: clamp(0.78rem, 1.1vw, 0.92rem);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.planet-pop-feed__bubble-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  overflow: hidden;
+  border-radius: 999px;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 999px;
+    background-color: white;
+  }
+}
+
+/* Photo */
+.planet-pop-feed__photo-shell {
+  width: clamp(34px, 10vw, 90px);
+  height: clamp(34px, 10vw, 90px);
+  overflow: hidden;
+  border: 3px solid var(--planet-pop-feed-photo-ring);
+  border-radius: var(--planet-pop-feed-photo-radius);
+  box-shadow: 0 14px 34px var(--planet-pop-feed-photo-shadow);
+  transform: rotate(var(--planet-pop-feed-rotation));
+  opacity: 0;
+  animation: planet-pop-feed-photo-life 5s ease both;
+  animation-delay: var(--planet-pop-feed-item-delay);
+}
+
+.planet-pop-feed__photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Animations */
+@keyframes planet-pop-feed-photo-life {
+  0% {
+    opacity: 0;
+    transform: translateY(22px) scale(0.8)
+      rotate(var(--planet-pop-feed-rotation));
+  }
+
+  12%,
+  72% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(var(--planet-pop-feed-rotation));
+  }
+
+  86% {
+    opacity: 0.92;
+    transform: translateY(-6px) scale(0.98)
+      rotate(calc(var(--planet-pop-feed-rotation) + 1deg));
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.9)
+      rotate(calc(var(--planet-pop-feed-rotation) + 2deg));
+  }
+}
+
+@keyframes planet-pop-feed-bubble-life {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.92);
+  }
+
+  14%,
+  72% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  88% {
+    opacity: 0.88;
+    transform: translateY(-5px) scale(0.98);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.94);
+  }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .planet-pop-feed__item--align-start .planet-pop-feed__bubbles {
+    transform: translateX(-30%);
+  }
+
+  .planet-pop-feed__item--align-end .planet-pop-feed__bubbles {
+    transform: translateX(-70%);
+  }
+
+  .planet-pop-feed__bubbles {
+    bottom: calc(100% - -10px);
+  }
+
+  .planet-pop-feed__item--align-start .planet-pop-feed__bubble::after {
+    left: 28%;
+  }
+
+  .planet-pop-feed__item--align-end .planet-pop-feed__bubble::after {
+    left: 72%;
+  }
+
+  .planet-pop-feed__bubble-icon {
+    top: -16px;
+    left: -6px;
+    width: 34px;
+    height: 34px;
+
+    img {
+      width: 34px;
+      height: 34px;
+    }
+  }
+
+  .planet-pop-feed__bubble-brand {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 999px;
+  }
+
+  .planet-pop-feed__photo-shell {
+    border-radius: 999px;
+  }
+}

@@ -68,17 +68,7 @@ const HotSection: React.FC<HotSectionProps> = ({
       </div>
     );
   }
-
-  // ⚠️ Aucun signalement hot
-  /*   if (!reportData.data || Object.keys(reportData.data).length === 0) {
-    return (
-      <div style={{ padding: "20px", textAlign: "center", color: "#888" }}>
-        Aucun signalement chaud trouvé.
-      </div>
-    );
-  } */
-  //console.log("🔥 HOT reportData", reportData.data);
-
+  console.log("HOT DATA SOURCE", reportData.data);
   // ✅ Contenu principal
   return (
     <>
