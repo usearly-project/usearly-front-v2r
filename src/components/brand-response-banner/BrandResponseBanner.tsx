@@ -6,6 +6,7 @@ import type { HasBrandResponse } from "@src/types/brandResponse";
 import { getBrandAvatarFromResponse } from "@src/utils/brandResponse";
 import { getBrandThemeColor } from "@src/utils/getBrandThemeColor";
 import ampoule from "/assets/svg/ampoule-bw.svg";
+import { getBrandLogo } from "@src/utils/brandLogos";
 
 type Props = {
   message: string;
@@ -25,6 +26,7 @@ const BrandResponseBanner: React.FC<Props> = ({
   brandResponse,
 }) => {
   const brandAvatar = getBrandAvatarFromResponse(brandResponse);
+  const fallbackLogo = getBrandLogo(brand, brandSiteUrl);
   const resolvedBrandName =
     brandAvatar?.pseudo ?? brandAvatar?.displayName ?? brand;
   const resolvedSiteUrl = brandAvatar?.siteUrl ?? brandSiteUrl ?? undefined;
@@ -69,7 +71,7 @@ const BrandResponseBanner: React.FC<Props> = ({
   return (
     <div className="brand-response-banner-wrapper">
       <Avatar
-        avatar={brandAvatar?.avatar ?? null}
+        avatar={brandAvatar?.avatar || fallbackLogo}
         pseudo={resolvedBrandName}
         type="brand"
         siteUrl={resolvedSiteUrl}

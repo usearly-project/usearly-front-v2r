@@ -20,7 +20,7 @@
 }
 
 .auth-tooltip {
-  position: absolute;
+  position: fixed;
   bottom: 70px; // ajuste selon ton UI
   left: 50%;
   transform: translateX(-50%);

@@ -272,6 +272,7 @@ export interface PopularGroupedReport {
   status: TicketStatusKey;
   category: string;
   solutionsCount?: number;
+  hasBrandResponse?: boolean;
   subCategory: string;
   count: number;
   createdAt: string;
@@ -307,7 +308,13 @@ export type PublicReport = {
     createdAt?: string;
   }[];
 
-  hasBrandResponse: boolean;
+  hasBrandResponse: {
+    type: "brand";
+    brand: string;
+    siteUrl?: string;
+    message?: string;
+    createdAt?: string;
+  } | null;
   createdAt: string;
 };
 export interface PopularReport {

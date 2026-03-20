@@ -1,6 +1,8 @@
 import type { FeedItem } from "@src/types/feedItem";
 import InteractiveFeedbackCard from "../InteractiveFeedbackCard/InteractiveFeedbackCard";
 import PopularReportCard from "../report-grouped/reports-popular/PopularReportCard";
+import { getBrandLogo } from "@src/utils/brandLogos";
+import { normalizeBrandResponse } from "@src/utils/brandResponse";
 
 interface Props {
   item: FeedItem;
@@ -10,6 +12,31 @@ interface Props {
 
 function FeedItemRenderer({ item, isOpen, isPublic = false }: Props) {
   if (item.type === "report") {
+    const raw = item.data.hasBrandResponse;
+
+    let finalBrandResponse = null;
+
+    if (raw) {
+      const enrichedRaw = {
+        ...raw,
+        avatar: getBrandLogo(item.data.marque, item.data.siteUrl ?? undefined),
+      };
+
+      const normalized = normalizeBrandResponse(enrichedRaw, {
+        brand: item.data.marque,
+        siteUrl: item.data.siteUrl ?? null,
+        avatar: enrichedRaw.avatar,
+      });
+
+      // 🔥 LA CLÉ EST ICI
+      if (normalized && typeof normalized === "object") {
+        finalBrandResponse = {
+          ...normalized,
+          message: raw.message,
+          createdAt: raw.createdAt,
+        };
+      }
+    }
     const adaptedReport = {
       reportingId: item.data.reportingId,
       marque: item.data.marque,
@@ -18,6 +45,7 @@ function FeedItemRenderer({ item, isOpen, isPublic = false }: Props) {
       status: "open",
       count: item.data.reportsCount,
       solutionsCount: item.data.solutionsCount,
+      hasBrandResponse: finalBrandResponse,
 
       descriptions: [
         {
@@ -47,6 +75,7 @@ function FeedItemRenderer({ item, isOpen, isPublic = false }: Props) {
         })),
       ],
     };
+    console.log("ADAPTED 👉", adaptedReport);
     return (
       <PopularReportCard
         item={adaptedReport as any}

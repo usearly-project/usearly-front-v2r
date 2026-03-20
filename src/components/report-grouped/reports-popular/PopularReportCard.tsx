@@ -7,8 +7,6 @@ import type { PopularGroupedReport } from "@src/types/Reports";
 import "./PopularReportCard.scss";
 import "@src/pages/home/confirm-reportlist/FlatSubcategoryBlock.scss";
 import { getBrandLogo } from "@src/utils/brandLogos";
-import { useBrandResponsesMap } from "@src/hooks/useBrandResponsesMap";
-import { normalizeBrandResponse } from "@src/utils/brandResponse";
 import PopularReportHeader from "./popular-report-header/PopularReportHeader";
 import PopularReportContent from "./popular-report-header/PopularReportContent";
 import PopularReportLightbox from "./popular-report-header/PopularReportLightbox";
@@ -48,6 +46,8 @@ const PopularReportCard: React.FC<Props> = ({
   const descriptionId = firstDescription?.id ?? "";
   const [showSolutionModal, setShowSolutionModal] = useState(false);
   const [showSolutionsList, setShowSolutionsList] = useState(false);
+  const [showAuthTooltip, setShowAuthTooltip] = useState(false);
+  const [tooltipText, setTooltipText] = useState("");
   const [solutionsCount, setSolutionsCount] = useState(
     item.solutionsCount ?? 0,
   );
@@ -58,11 +58,7 @@ const PopularReportCard: React.FC<Props> = ({
     "report",
     refreshKey,
   );
-  /*   const { comments, loading } = useCommentsForDescription(
-    descriptionId,
-    "report",
-    refreshKey,
-  ); */
+
   const latestDate = useMemo(() => {
     if (!item.descriptions?.length) return null;
 
@@ -111,17 +107,7 @@ const PopularReportCard: React.FC<Props> = ({
     return `${truncated}${suffix} ${firstDescription.emoji || ""}`.trim();
   }, [firstDescription?.description, firstDescription?.emoji, showFullText]);
 
-  //const reportIds = item.reportingId ? [item.reportingId] : [];
-  const reportIds = !isPublic && item.reportingId ? [item.reportingId] : [];
-
-  const { brandResponsesMap } = useBrandResponsesMap(reportIds);
-  const hasBrandResponse = !isPublic
-    ? normalizeBrandResponse(brandResponsesMap[item.reportingId], {
-        brand: item.marque,
-        siteUrl: item.siteUrl ?? null,
-        avatar: getBrandLogo(item.marque, item.siteUrl ?? undefined),
-      })
-    : undefined;
+  const hasBrandResponse = item.hasBrandResponse || null;
 
   const author: {
     id: string;
@@ -140,10 +126,18 @@ const PopularReportCard: React.FC<Props> = ({
   const captureUrl = firstDescription.capture ?? null;
   const additionalDescriptions = item.descriptions.slice(1);
 
+  const triggerTooltip = (text: string) => {
+    setTooltipText(text);
+    setShowAuthTooltip(true);
+
+    setTimeout(() => {
+      setShowAuthTooltip(false);
+    }, 2000);
+  };
   const handleCommentClick = () => {
-    if (isPublic) {
-      window.dispatchEvent(new Event("USEARLY_OPEN_LOGIN"));
-      // MAIS on continue quand même
+    if (!userProfile?.id) {
+      triggerTooltip("Connecte-toi pour voir la réponse de la marque");
+      return; // ⛔ on bloque
     }
 
     if (!isOpen) {
@@ -228,12 +222,14 @@ const PopularReportCard: React.FC<Props> = ({
             }}
             isPublic={isPublic}
           />
+          {showAuthTooltip && <div className="auth-tooltip">{tooltipText}</div>}
           <PopularReportComments
             userProfile={userProfile}
             descriptionId={descriptionId}
             showComments={showComments}
             setLocalCommentsCounts={setLocalCommentsCounts}
             setRefreshKey={setRefreshKey}
+            brandResponse={hasBrandResponse}
           />
 
           <PopularReportSimilar
