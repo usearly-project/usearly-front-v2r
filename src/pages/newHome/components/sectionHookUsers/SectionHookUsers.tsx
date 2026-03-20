@@ -1,8 +1,11 @@
+import { useState } from "react";
 import PlanetCanvas from "@src/components/canvas/PlanetCanvas";
 import type { PopFeedVariant } from "@src/components/canvas/planetCanvas/types";
 import { useIsMobile } from "@src/hooks/use-mobile";
 import "./SectionHookUsers.scss";
 import SquareRoundButton from "@src/components/buttons/SquareRoundButton";
+import Modal from "@src/components/ui/Modal";
+import ExtensionRedirect from "@src/components/extension-redirect/ExtensionRedirect";
 import MobileSectionHookUsers from "./MobileSectionhookUsers";
 import chromeLogo from "/assets/logo/chrome.svg";
 
@@ -32,6 +35,7 @@ const SectionHookUsers = ({
   popFeedVariant = "default",
 }: SectionHookUsersProps) => {
   const isMobile = useIsMobile("(max-width: 1250px)");
+  const [isExtensionModalOpen, setIsExtensionModalOpen] = useState(false);
 
   if (isMobile) {
     return (
@@ -48,30 +52,50 @@ const SectionHookUsers = ({
   }
 
   return (
-    <section className="section-hook-users">
-      <div className="hook-users-content">
-        <div className="hook-users-content-text">
-          <h2 className="hook-users-title">{SECTION_HOOK_USERS_TITLE}</h2>
-          <p className="hook-users-subtitle">{SECTION_HOOK_USERS_SUBTITLE}</p>
+    <>
+      <section className="section-hook-users">
+        <div className="hook-users-content">
+          <div className="hook-users-content-text">
+            <h2 className="hook-users-title">{SECTION_HOOK_USERS_TITLE}</h2>
+            <p className="hook-users-subtitle">{SECTION_HOOK_USERS_SUBTITLE}</p>
+          </div>
+          <div className="hook-users-content-buttons">
+            <button type="button" className="hook-users-extension-button">
+              <img src={chromeLogo} width={46} height={46} alt="Chrome" />
+              {EXTENSION_BUTTON_LABEL}
+            </button>
+            <SquareRoundButton
+              text={COMMUNITY_BUTTON_LABEL}
+              classNames={"button-rejoindre"}
+            />
+          </div>
+          <div className="hook-users-content-explication">
+            <button type="button" onClick={() => setIsExtensionModalOpen(true)}>
+              Comment installer l’extension en 2 minutes ?
+            </button>
+          </div>
         </div>
-        <div className="hook-users-content-buttons">
-          <button className="hook-users-extension-button">
-            <img src={chromeLogo} width={46} height={46} alt="Chrome" />
-            {EXTENSION_BUTTON_LABEL}
-          </button>
-          <SquareRoundButton
-            text={COMMUNITY_BUTTON_LABEL}
-            classNames={"button-rejoindre"}
+        <PlanetCanvas
+          width={1500}
+          height="100vh"
+          popFeed
+          popFeedVariant={popFeedVariant}
+        />
+      </section>
+
+      {isExtensionModalOpen ? (
+        <Modal
+          onClose={() => setIsExtensionModalOpen(false)}
+          overlayClassName="extension-redirect-modal-overlay"
+          contentClassName="extension-redirect-modal-content"
+        >
+          <ExtensionRedirect
+            isModal
+            onClose={() => setIsExtensionModalOpen(false)}
           />
-        </div>
-      </div>
-      <PlanetCanvas
-        width={1500}
-        height="100vh"
-        popFeed
-        popFeedVariant={popFeedVariant}
-      />
-    </section>
+        </Modal>
+      ) : null}
+    </>
   );
 };
 

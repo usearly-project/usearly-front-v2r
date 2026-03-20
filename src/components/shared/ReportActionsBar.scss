@@ -383,7 +383,7 @@
   position: relative; // 🔥 obligatoire
 
   .auth-tooltip {
-    position: absolute;
+    position: fixed;
     bottom: 55px;
     left: 50%;
     transform: translateX(-50%);

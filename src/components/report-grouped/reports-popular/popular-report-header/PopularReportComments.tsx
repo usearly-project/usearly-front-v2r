@@ -1,3 +1,4 @@
+import BrandResponseBanner from "@src/components/brand-response-banner/BrandResponseBanner";
 import DescriptionCommentSection from "@src/components/report-desc-comment/DescriptionCommentSection";
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
     React.SetStateAction<Record<string, number>>
   >;
   setRefreshKey: React.Dispatch<React.SetStateAction<number>>;
+  brandResponse?: any;
 }
 
 const PopularReportComments: React.FC<Props> = ({
@@ -16,24 +18,37 @@ const PopularReportComments: React.FC<Props> = ({
   showComments,
   setLocalCommentsCounts,
   setRefreshKey,
+  brandResponse,
 }) => {
   if (!showComments || !userProfile?.id) return null;
 
   return (
-    <DescriptionCommentSection
-      userId={userProfile.id}
-      descriptionId={descriptionId}
-      type="report"
-      hideFooter={true}
-      forceOpen={true}
-      onCommentCountChange={(count) =>
-        setLocalCommentsCounts((prev) => ({
-          ...prev,
-          [descriptionId]: count,
-        }))
-      }
-      onCommentAddedOrDeleted={() => setRefreshKey((prev) => prev + 1)}
-    />
+    <>
+      {brandResponse?.message && (
+        <BrandResponseBanner
+          message={brandResponse.message}
+          createdAt={brandResponse.createdAt}
+          brand={brandResponse.brand}
+          brandSiteUrl={brandResponse.siteUrl}
+          brandResponse={brandResponse}
+        />
+      )}
+
+      <DescriptionCommentSection
+        userId={userProfile.id}
+        descriptionId={descriptionId}
+        type="report"
+        hideFooter={true}
+        forceOpen={true}
+        onCommentCountChange={(count) =>
+          setLocalCommentsCounts((prev) => ({
+            ...prev,
+            [descriptionId]: count,
+          }))
+        }
+        onCommentAddedOrDeleted={() => setRefreshKey((prev) => prev + 1)}
+      />
+    </>
   );
 };
 

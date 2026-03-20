@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 
 type AnimatedExtensionLandingSlideProps = {
   src: string;
@@ -8,21 +8,86 @@ type AnimatedExtensionLandingSlideProps = {
 
 const slideMarkupCache = new Map<string, string>();
 
+const replaceEvery = (source: string, search: string, replacement: string) => {
+  return source.split(search).join(replacement);
+};
+
+const scopeSvgMarkup = (svgMarkup: string, scopeId: string) => {
+  if (
+    typeof DOMParser === "undefined" ||
+    typeof XMLSerializer === "undefined"
+  ) {
+    return svgMarkup;
+  }
+
+  try {
+    const parser = new DOMParser();
+    const document = parser.parseFromString(svgMarkup, "image/svg+xml");
+    const svgElement = document.documentElement;
+    const elementsWithIds = Array.from(svgElement.querySelectorAll("[id]"));
+
+    if (!elementsWithIds.length) {
+      return svgMarkup;
+    }
+
+    const idMap = new Map<string, string>();
+
+    elementsWithIds.forEach((element, index) => {
+      const currentId = element.getAttribute("id");
+      if (!currentId) return;
+
+      const scopedElementId = `${scopeId}-${currentId}-${index}`;
+      idMap.set(currentId, scopedElementId);
+      element.setAttribute("id", scopedElementId);
+    });
+
+    let scopedMarkup = new XMLSerializer().serializeToString(svgElement);
+
+    idMap.forEach((scopedElementId, currentId) => {
+      scopedMarkup = replaceEvery(
+        scopedMarkup,
+        `url(#${currentId})`,
+        `url(#${scopedElementId})`,
+      );
+      scopedMarkup = replaceEvery(
+        scopedMarkup,
+        `="#${currentId}"`,
+        `="#${scopedElementId}"`,
+      );
+      scopedMarkup = replaceEvery(
+        scopedMarkup,
+        `='#${currentId}'`,
+        `='#${scopedElementId}'`,
+      );
+    });
+
+    return scopedMarkup;
+  } catch {
+    return svgMarkup;
+  }
+};
+
 const AnimatedExtensionLandingSlide = ({
   src,
   alt,
   className,
 }: AnimatedExtensionLandingSlideProps) => {
-  const [markup, setMarkup] = useState(() => slideMarkupCache.get(src) ?? "");
+  const scopeId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const [markup, setMarkup] = useState(() => {
+    const cachedMarkup = slideMarkupCache.get(src);
+    return cachedMarkup ? scopeSvgMarkup(cachedMarkup, scopeId) : "";
+  });
 
   useEffect(() => {
     let isCancelled = false;
 
     const cachedMarkup = slideMarkupCache.get(src);
     if (cachedMarkup) {
-      setMarkup(cachedMarkup);
+      setMarkup(scopeSvgMarkup(cachedMarkup, scopeId));
       return;
     }
+
+    setMarkup("");
 
     const loadMarkup = async () => {
       try {
@@ -33,7 +98,7 @@ const AnimatedExtensionLandingSlide = ({
         slideMarkupCache.set(src, svgMarkup);
 
         if (!isCancelled) {
-          setMarkup(svgMarkup);
+          setMarkup(scopeSvgMarkup(svgMarkup, scopeId));
         }
       } catch {
         if (!isCancelled) {
@@ -47,7 +112,7 @@ const AnimatedExtensionLandingSlide = ({
     return () => {
       isCancelled = true;
     };
-  }, [src]);
+  }, [scopeId, src]);
 
   if (!markup) {
     return <img src={src} alt={alt} draggable={false} className={className} />;
