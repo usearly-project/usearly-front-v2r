@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import PlanetCanvas from "@src/components/canvas/PlanetCanvas";
+import type { PopFeedVariant } from "@src/components/canvas/planetCanvas/types";
 import SquareRoundButton from "@src/components/buttons/SquareRoundButton";
 import "./MobileSectionhookUsers.scss";
 
@@ -10,6 +11,7 @@ type MobileSectionHookUsersProps = {
   communityLabel: string;
   extensionIconSrc: string;
   extensionIconAlt: string;
+  popFeedVariant?: PopFeedVariant;
 };
 
 const MobileSectionHookUsers = ({
@@ -19,6 +21,7 @@ const MobileSectionHookUsers = ({
   communityLabel,
   extensionIconSrc,
   extensionIconAlt,
+  popFeedVariant = "default",
 }: MobileSectionHookUsersProps) => {
   return (
     <section className="mobile-sectionhook-users">
@@ -28,6 +31,7 @@ const MobileSectionHookUsers = ({
           height="clamp(385px, 58vw, 460px)"
           className="mobile-sectionhook-users__canvas"
           popFeed
+          popFeedVariant={popFeedVariant}
         />
       </div>
 

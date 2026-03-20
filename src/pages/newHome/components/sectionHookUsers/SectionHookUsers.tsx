@@ -1,4 +1,5 @@
 import PlanetCanvas from "@src/components/canvas/PlanetCanvas";
+import type { PopFeedVariant } from "@src/components/canvas/planetCanvas/types";
 import { useIsMobile } from "@src/hooks/use-mobile";
 import "./SectionHookUsers.scss";
 import SquareRoundButton from "@src/components/buttons/SquareRoundButton";
@@ -23,7 +24,13 @@ const SECTION_HOOK_USERS_SUBTITLE = (
 const EXTENSION_BUTTON_LABEL = "Installer l'extension";
 const COMMUNITY_BUTTON_LABEL = "Rejoindre la communauté";
 
-const SectionHookUsers = () => {
+type SectionHookUsersProps = {
+  popFeedVariant?: PopFeedVariant;
+};
+
+const SectionHookUsers = ({
+  popFeedVariant = "default",
+}: SectionHookUsersProps) => {
   const isMobile = useIsMobile("(max-width: 1250px)");
 
   if (isMobile) {
@@ -35,6 +42,7 @@ const SectionHookUsers = () => {
         communityLabel={COMMUNITY_BUTTON_LABEL}
         extensionIconSrc={chromeLogo}
         extensionIconAlt="Chrome"
+        popFeedVariant={popFeedVariant}
       />
     );
   }
@@ -57,7 +65,12 @@ const SectionHookUsers = () => {
           />
         </div>
       </div>
-      <PlanetCanvas width={1500} height={910} popFeed />
+      <PlanetCanvas
+        width={1500}
+        height="100vh"
+        popFeed
+        popFeedVariant={popFeedVariant}
+      />
     </section>
   );
 };

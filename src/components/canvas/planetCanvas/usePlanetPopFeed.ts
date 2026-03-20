@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import {
   PLANET_CANVAS_TRAIL_IMAGES,
-  POP_FEED_BRAND_LOGOS,
+  POP_FEED_BRANDS,
   POP_FEED_LIFETIME_MS,
   POP_FEED_MAX_ATTEMPTS,
-  POP_FEED_THEME_CONFIG,
+  buildPopFeedBrandMessage,
 } from "./planetCanvasConfig";
 import {
   clamp,
@@ -17,6 +17,7 @@ import {
 } from "./planetCanvasUtils";
 import type {
   PlanetCanvasPosition,
+  PlanetPopFeedBrandConfig,
   PlanetPopFeedBubble,
   PlanetPopFeedItemData,
   PopFeedTheme,
@@ -30,6 +31,7 @@ type BuildFeedItemArgs = {
   itemId: string;
   bubbleId: string;
   theme: PopFeedTheme;
+  brand: PlanetPopFeedBrandConfig;
   image: string;
   appearanceDelayMs: number;
   position: PlanetCanvasPosition;
@@ -39,19 +41,24 @@ type BuildFeedItemArgs = {
 const createFeedItemId = () =>
   `planet-feed-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-const pickRandomBrandLogo = () => pickRandomValue(POP_FEED_BRAND_LOGOS);
+const pickRandomBrand = () => pickRandomValue(POP_FEED_BRANDS);
 
-const buildBubble = (id: string, message: string): PlanetPopFeedBubble => ({
+const buildBubble = (
+  id: string,
+  brand: PlanetPopFeedBrandConfig,
+  message: string,
+): PlanetPopFeedBubble => ({
   id,
   message,
   delayMs: 0,
-  brandImage: pickRandomBrandLogo(),
+  brandImage: brand.image,
 });
 
 const buildFeedItem = ({
   itemId,
   bubbleId,
   theme,
+  brand,
   image,
   appearanceDelayMs,
   position,
@@ -63,7 +70,7 @@ const buildFeedItem = ({
   appearanceDelayMs,
   position,
   rotation: getRandomBetween(-7, 7),
-  bubbles: [buildBubble(bubbleId, message)],
+  bubbles: [buildBubble(bubbleId, brand, message)],
 });
 
 const usePlanetPopFeed = (enabled: boolean) => {
@@ -267,10 +274,10 @@ const usePlanetPopFeed = (enabled: boolean) => {
         theme = Math.random() < 0.5 ? "suggestion" : "coupDeCoeur";
       }
 
-      const themeConfig = POP_FEED_THEME_CONFIG[theme];
       const itemBaseId = createFeedItemId();
 
       if (theme === "report" && allowReportPairs) {
+        const brand = pickRandomBrand();
         const primaryImage = pickImage();
         const secondaryImage = pickDifferentImage(primaryImage);
         const primaryPosition = pickPosition("report");
@@ -284,16 +291,17 @@ const usePlanetPopFeed = (enabled: boolean) => {
         }
 
         const pairDelayMs = getRandomBetween(220, 360);
-        const message = pickRandomValue(themeConfig.messages);
-        const linkedMessage = pickRandomValue(
-          themeConfig.linkedMessages ?? themeConfig.messages,
-        );
+        const message = buildPopFeedBrandMessage(brand, "report");
+        const linkedMessage = buildPopFeedBrandMessage(brand, "report", {
+          linked: true,
+        });
 
         const nextItems: PlanetPopFeedItemData[] = [
           buildFeedItem({
             itemId: `${itemBaseId}-a`,
             bubbleId: `${itemBaseId}-a-primary`,
             theme: "report",
+            brand,
             image: primaryImage,
             appearanceDelayMs: 0,
             position: primaryPosition,
@@ -303,6 +311,7 @@ const usePlanetPopFeed = (enabled: boolean) => {
             itemId: `${itemBaseId}-b`,
             bubbleId: `${itemBaseId}-b-primary`,
             theme: "report",
+            brand,
             image: secondaryImage,
             appearanceDelayMs: pairDelayMs,
             position: secondaryPosition,
@@ -319,14 +328,16 @@ const usePlanetPopFeed = (enabled: boolean) => {
         return;
       }
 
+      const brand = pickRandomBrand();
       const nextItem = buildFeedItem({
         itemId: itemBaseId,
         bubbleId: `${itemBaseId}-primary`,
         theme,
+        brand,
         image: pickImage(),
         appearanceDelayMs: 0,
         position: pickPosition(theme),
-        message: pickRandomValue(themeConfig.messages),
+        message: buildPopFeedBrandMessage(brand, theme),
       });
 
       syncFeedItems((currentItems) => [...currentItems, nextItem]);
