@@ -41,6 +41,7 @@
         gap: 10px;
         padding: 16px;
         border-radius: 10px;
+        border: none;
         background: #fff;
         box-shadow: 0 4px 17.9px 0 rgba(0, 0, 0, 0.25);
         color: #2361d4;
@@ -49,10 +50,57 @@
         font-style: normal;
         font-weight: 700;
         line-height: 158.293%; /* 31.659px */
+        cursor: pointer;
       }
       .button-rejoindre {
         font-weight: 900;
       }
     }
+
+    .hook-users-content-explication {
+      margin-top: 22px;
+
+      button {
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: #2361d4;
+        font-family: $font-family-3;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 145%;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        cursor: pointer;
+
+        &:focus-visible {
+          outline: 2px solid #2361d4;
+          outline-offset: 4px;
+          border-radius: 6px;
+        }
+      }
+    }
+  }
+}
+
+.extension-redirect-modal-overlay {
+  align-items: center;
+}
+
+.extension-redirect-modal-content {
+  width: min(1100px, 100%);
+  max-width: 1100px;
+  max-height: none;
+  padding: 0;
+  background: transparent;
+  border-radius: 36px;
+  box-shadow: none;
+  overflow: visible;
+}
+
+@media screen and (max-width: 680px) {
+  .extension-redirect-modal-content {
+    border-radius: 28px;
   }
 }

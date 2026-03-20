@@ -13,26 +13,38 @@ import AnimatedExtensionLandingSlide from "./AnimatedExtensionLandingSlide";
 
 const extensionSlides = [
   {
-    src: "/assets/images/Landing/ExtensionLandingSlide1.svg",
+    src: "/assets/images/chromeExtensionImg.svg",
     alt: "Aperçu de l'extension Usearly, slide 1",
   },
   {
-    src: "/assets/images/Landing/ExtensionLandingSlide2.svg",
+    src: "/assets/images/Landing/ExtensionLandingSlide1.svg",
     alt: "Aperçu de l'extension Usearly, slide 2",
   },
   {
-    src: "/assets/images/Landing/ExtensionLandingSlide3.svg",
+    src: "/assets/images/Landing/ExtensionLandingSlide2.svg",
     alt: "Aperçu de l'extension Usearly, slide 3",
   },
   {
-    src: "/assets/images/Landing/ExtensionLandingSlide4.svg",
+    src: "/assets/images/Landing/ExtensionLandingSlide3.svg",
     alt: "Aperçu de l'extension Usearly, slide 4",
+  },
+  {
+    src: "/assets/images/Landing/ExtensionLandingSlide4.svg",
+    alt: "Aperçu de l'extension Usearly, slide 5",
   },
 ];
 
 const SWIPE_THRESHOLD = 48;
 
-const ExtensionRedirect = () => {
+type ExtensionRedirectProps = {
+  isModal?: boolean;
+  onClose?: () => void;
+};
+
+const ExtensionRedirect = ({
+  isModal = false,
+  onClose,
+}: ExtensionRedirectProps) => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isCarouselVisible, setIsCarouselVisible] = useState(false);
   const [activeSlideAnimationToken, setActiveSlideAnimationToken] = useState(0);
@@ -46,6 +58,14 @@ const ExtensionRedirect = () => {
   const shouldSkipNextSlideReplay = useRef(false);
 
   useEffect(() => {
+    if (isModal) {
+      setIsCarouselVisible(true);
+      hasTriggeredInitialAnimation.current = true;
+      shouldSkipNextSlideReplay.current = true;
+      setActiveSlideAnimationToken(1);
+      return;
+    }
+
     const viewport = viewportRef.current;
     if (!viewport || typeof IntersectionObserver === "undefined") {
       setIsCarouselVisible(true);
@@ -77,7 +97,7 @@ const ExtensionRedirect = () => {
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [isModal]);
 
   useEffect(() => {
     if (!isCarouselVisible || !hasTriggeredInitialAnimation.current) return;
@@ -167,8 +187,29 @@ const ExtensionRedirect = () => {
     }
   };
 
+  const isLastSlide = activeSlide === extensionSlides.length - 1;
+
   return (
-    <div className="extension-redirect-container">
+    <div
+      className={`extension-redirect-container ${
+        isModal ? "extension-redirect-container--modal" : ""
+      }`}
+    >
+      {isModal && onClose ? (
+        <button
+          type="button"
+          className="extension-redirect-modal-close"
+          onClick={onClose}
+          aria-label="Fermer la fenêtre d'installation de l'extension"
+        >
+          <span
+            className="extension-redirect-modal-close-text"
+            aria-hidden="true"
+          >
+            ×
+          </span>
+        </button>
+      ) : null}
       <div className="extension-redirect-text-container">
         <div className="extension-redirect-text-title">
           <h2>Installer l'extension Usearly</h2>
@@ -197,7 +238,11 @@ const ExtensionRedirect = () => {
           </a>
         </div>
       </div>
-      <div className="extension-redirect-image-container">
+      <div
+        className={`extension-redirect-image-container ${
+          isLastSlide ? "is-last-slide" : ""
+        }`}
+      >
         <div
           className="extension-redirect-carousel"
           role="region"
